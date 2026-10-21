@@ -1,0 +1,374 @@
+{% extends "accounts/auth_base.html" %}
+{% block title %}Staff Access Portal{% endblock %}
+
+{% block content %}
+<style>
+/* Dark Prison Theme - Staff Login with Fixed Labels */
+:root {
+    --bg-dark: #1a1a1a;
+    --bg-card: #2d2d2d;
+    --bg-input: #404040;
+    --border: #666;
+    --text-white: #ffffff;
+    --text-muted: #cccccc;
+    --primary: #0066cc;
+    --danger: #ff4444;
+    --warning: #ffc107;
+}
+
+body {
+    background: var(--bg-dark) !important;
+    color: var(--text-white) !important;
+}
+
+.card {
+    background: var(--bg-card) !important;
+    border: 2px solid var(--border) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+}
+
+.card-body {
+    background: var(--bg-card) !important;
+    color: var(--text-white) !important;
+}
+
+.auth-header {
+    background: linear-gradient(135deg, var(--bg-card) 0%, #333 100%) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 8px !important;
+    padding: 2rem !important;
+    margin-bottom: 1.5rem !important;
+    text-align: center !important;
+    border-top: 4px solid var(--danger) !important;
+    color: var(--text-white) !important;
+}
+
+.auth-header h3 {
+    color: var(--text-white) !important;
+    font-weight: 700 !important;
+    margin: 1rem 0 0.5rem 0 !important;
+    font-size: 1.5rem !important;
+}
+
+.auth-header p {
+    color: var(--text-muted) !important;
+    margin-bottom: 0 !important;
+}
+
+/* FIXED - All Label Types Now Clearly Visible */
+.form-label,
+label.form-label,
+label {
+    color: var(--text-white) !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 1rem !important;
+    display: block !important;
+    background: none !important;
+}
+
+/* Ensure icons in labels are visible */
+.form-label i,
+label i {
+    color: var(--primary) !important;
+    margin-right: 0.5rem !important;
+}
+
+/* Override any Bootstrap or inherited label styles */
+.mb-3 label,
+.mb-4 label,
+div label {
+    color: var(--text-white) !important;
+    font-weight: 600 !important;
+    display: block !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.form-control {
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    color: var(--text-white) !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 6px !important;
+    font-size: 1rem !important;
+}
+
+.form-control:focus {
+    background: var(--bg-input) !important;
+    border-color: var(--primary) !important;
+    color: var(--text-white) !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25) !important;
+}
+
+.form-control::placeholder {
+    color: var(--text-muted) !important;
+}
+
+.btn-primary {
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.75rem 1.5rem !important;
+    font-size: 1rem !important;
+}
+
+.btn-primary:hover {
+    background: #0056b3 !important;
+    border-color: #0056b3 !important;
+    transform: translateY(-1px) !important;
+}
+
+.btn-outline-secondary {
+    background: var(--bg-input) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-muted) !important;
+}
+
+.btn-outline-secondary:hover {
+    background: var(--border) !important;
+    color: var(--text-white) !important;
+}
+
+.input-group .btn {
+    border-left: none !important;
+}
+
+.alert-danger {
+    background: rgba(255, 68, 68, 0.15) !important;
+    color: #ffaaaa !important;
+    border: 2px solid var(--danger) !important;
+    border-radius: 6px !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.text-primary {
+    color: var(--primary) !important;
+}
+
+.text-danger {
+    color: var(--danger) !important;
+}
+
+a {
+    color: var(--primary) !important;
+}
+
+a:hover {
+    color: #66bbff !important;
+}
+
+hr {
+    border-color: var(--border) !important;
+}
+
+.security-notice {
+    background: rgba(255, 193, 7, 0.1) !important;
+    border: 2px solid var(--warning) !important;
+    border-radius: 6px !important;
+    padding: 1rem !important;
+    margin: 1rem 0 !important;
+    color: var(--warning) !important;
+}
+
+.info-box {
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 6px !important;
+    padding: 1rem !important;
+    margin: 1rem 0 !important;
+}
+
+.info-box strong {
+    color: var(--text-white) !important;
+}
+
+.help-text {
+    color: var(--text-muted) !important;
+    font-size: 0.85rem !important;
+}
+
+/* Additional label visibility fixes */
+.form-group label,
+.mb-3 > label,
+.mb-4 > label {
+    color: var(--text-white) !important;
+    font-weight: 600 !important;
+}
+
+/* Force visibility on all potential label selectors */
+[class*="label"],
+[for] {
+    color: var(--text-white) !important;
+}
+</style>
+
+<div class="auth-header">
+    <i class="bi bi-shield-lock-fill fs-1 text-danger"></i>
+    <h3>STAFF ACCESS PORTAL</h3>
+    <p>Authorized Personnel Only - Kerala Prison Management</p>
+</div>
+
+<div class="card-body px-4 pb-4">
+    <!-- Security Warning -->
+    <div class="security-notice mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong>RESTRICTED ACCESS:</strong> Unauthorized access is prohibited and monitored.
+    </div>
+
+    <!-- Error Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-danger">
+                <i class="bi bi-shield-x me-2"></i>
+                <strong>Access Denied:</strong> {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="username" class="form-label" style="color: #ffffff !important; font-weight: 600; display: block;">
+                <i class="bi bi-person-badge me-2" style="color: #0066cc;"></i>Staff Username
+            </label>
+            <input type="text" 
+                   name="username" 
+                   class="form-control" 
+                   id="username" 
+                   placeholder="Enter your staff username"
+                   autocomplete="username"
+                   required
+                   value="{{ request.POST.username|default:'' }}">
+        </div>
+        
+        <div class="mb-4">
+            <label for="password" class="form-label" style="color: #ffffff !important; font-weight: 600; display: block;">
+                <i class="bi bi-lock-fill me-2" style="color: #0066cc;"></i>Secure Password
+            </label>
+            <div class="input-group">
+                <input type="password" 
+                       name="password" 
+                       class="form-control" 
+                       id="password" 
+                       placeholder="Enter your secure password"
+                       autocomplete="current-password"
+                       required>
+                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                    <i class="bi bi-eye" id="toggleIcon"></i>
+                </button>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 mb-3" id="loginBtn">
+            <i class="bi bi-shield-check me-2"></i>Secure Login
+        </button>
+        
+        <div class="text-center mb-3">
+            <small class="text-muted">
+                <i class="bi bi-telephone me-1"></i>
+                Staff Support: 1800-STAFF-HELP
+            </small>
+        </div>
+    </form>
+
+    <hr class="my-4">
+
+    <!-- Staff Access Levels -->
+    <div class="info-box">
+        <strong class="text-primary">Access Levels:</strong>
+        <div class="help-text mt-2">
+            <strong>Security Staff:</strong> Gate operations, visitor check-in/out, QR verification<br>
+            <strong>Prison Admin:</strong> Full system access, visit approvals, staff management<br>
+            <strong>Emergency:</strong> Contact system administrator for urgent access issues
+        </div>
+    </div>
+
+    <!-- Quick Access Info -->
+    <div class="info-box mt-3">
+        <strong class="text-primary">System Features:</strong>
+        <div class="help-text mt-2">
+            • Real-time visitor tracking and monitoring<br>
+            • QR code verification and security scanning<br>
+            • Emergency alert system and panic buttons<br>
+            • Comprehensive audit logs and reporting
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password visibility toggle
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordField = document.getElementById('password');
+    const toggleIcon = document.getElementById('toggleIcon');
+
+    if (togglePassword) {
+        togglePassword.addEventListener('click', function() {
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            toggleIcon.className = type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+        });
+    }
+
+    // Form submission handling
+    const form = document.querySelector('form');
+    const loginBtn = document.getElementById('loginBtn');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            // Basic validation
+            if (!username || !password) {
+                e.preventDefault();
+                alert('Please enter both username and password.');
+                return false;
+            }
+
+            // Loading state
+            loginBtn.innerHTML = '<i class="bi bi-shield-check me-2"></i>Authenticating...';
+            loginBtn.disabled = true;
+            
+            // Reset after 5 seconds if still on page
+            setTimeout(() => {
+                loginBtn.innerHTML = '<i class="bi bi-shield-check me-2"></i>Secure Login';
+                loginBtn.disabled = false;
+            }, 5000);
+        });
+    }
+
+    // Input validation styling
+    const inputs = document.querySelectorAll('.form-control');
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.required && !this.value.trim()) {
+                this.style.borderColor = 'var(--danger)';
+            } else {
+                this.style.borderColor = 'var(--border)';
+            }
+        });
+        
+        input.addEventListener('input', function() {
+            this.style.borderColor = 'var(--border)';
+        });
+    });
+
+    // Focus on username field
+    document.getElementById('username').focus();
+
+    // Force label visibility on page load
+    const labels = document.querySelectorAll('label, .form-label');
+    labels.forEach(label => {
+        label.style.color = '#ffffff';
+        label.style.fontWeight = '600';
+        label.style.display = 'block';
+    });
+});
+</script>
+{% endblock %}

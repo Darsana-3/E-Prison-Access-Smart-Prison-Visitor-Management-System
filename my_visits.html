@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}My Visit Requests{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">My Visit History</h2>
+    <a href="{% url 'request_visit' %}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Book a New Visit</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Prisoner Name</th>
+                        <th>Jail</th>
+                        <th>Visit Date</th>
+                        <th>Time Slot</th>
+                        <th>Status</th>
+                        <th class="text-center">QR Code</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for visit in visits %}
+                    <tr>
+                        <td>{{ visit.prisoner.first_name }} {{ visit.prisoner.last_name }}</td>
+                        <td>{{ visit.prisoner.jail.name }}</td>
+                        <td>{{ visit.visit_date }}</td>
+                        <td>{{ visit.visit_time_slot }}</td>
+                        <td>
+                            {% if visit.status == 'PENDING' %}
+                                <span class="badge bg-warning text-dark">Pending Approval</span>
+                            {% elif visit.status == 'APPROVED' %}
+                                <span class="badge bg-success">Approved</span>
+                            {% elif visit.status == 'REJECTED' %}
+                                <span class="badge bg-danger">Rejected</span>
+                            {% elif visit.status == 'COMPLETED' %}
+                                <span class="badge bg-secondary">Completed</span>
+                            {% else %}
+                                <span class="badge bg-info">{{ visit.status|title }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if visit.status == 'APPROVED' and visit.qr_code %}
+                                <a href="{{ visit.qr_code.url }}" target="_blank">
+                                    <img src="{{ visit.qr_code.url }}" alt="Visit QR Code" width="80" class="img-thumbnail">
+                                </a>
+                            {% else %}
+                                <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            <p class="mb-2">You have not requested any visits yet.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

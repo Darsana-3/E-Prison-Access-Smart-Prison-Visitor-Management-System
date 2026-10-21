@@ -1,0 +1,726 @@
+{% extends "base.html" %}
+{% block title %}Blacklist Management{% endblock %}
+
+{% block content %}
+<style>
+/* Dark Prison Theme - Blacklist Management */
+:root {
+    --bg-dark: #1a1a1a;
+    --bg-card: #2d2d2d;
+    --bg-input: #404040;
+    --bg-accent: #363636;
+    --bg-table-row: #333333;
+    --border: #555;
+    --text-white: #ffffff;
+    --text-bright: #f8f9fa;
+    --text-light: #e9ecef;
+    --text-muted: #d1d5db;
+    --text-gray: #9ca3af;
+    --name-black: #000000;
+    --primary: #0066cc;
+    --success: #28a745;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --info: #17a2b8;
+}
+
+body {
+    background: var(--bg-dark) !important;
+    color: var(--text-white) !important;
+}
+
+/* Page Header */
+.page-header {
+    background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-accent) 100%);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-top: 4px solid var(--danger);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.page-header h2 {
+    color: var(--text-white) !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 1.6rem !important;
+}
+
+.page-subtitle {
+    color: var(--text-light) !important;
+    font-size: 0.95rem !important;
+    margin-bottom: 0 !important;
+    opacity: 0.9;
+}
+
+/* Security Warning */
+.security-warning {
+    background: rgba(220, 53, 69, 0.1) !important;
+    border: 2px solid var(--danger) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin-bottom: 2rem !important;
+    color: var(--danger) !important;
+}
+
+.security-warning strong {
+    color: var(--text-white) !important;
+}
+
+/* Blacklist Form Card */
+.blacklist-form-card {
+    background: var(--bg-card) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4) !important;
+    overflow: hidden;
+}
+
+.blacklist-form-card .card-header {
+    background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%) !important;
+    border-bottom: 2px solid var(--border) !important;
+    color: white !important;
+    padding: 1.5rem !important;
+}
+
+.blacklist-form-card .card-header h4 {
+    color: white !important;
+    font-weight: 700 !important;
+    margin-bottom: 0 !important;
+    font-size: 1.2rem !important;
+}
+
+.blacklist-form-card .card-body {
+    background: transparent !important;
+    color: var(--text-white) !important;
+    padding: 2rem !important;
+}
+
+/* Enhanced Form Labels and Inputs */
+.form-label {
+    color: var(--text-white) !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.75rem !important;
+    font-size: 0.95rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    display: block !important;
+}
+
+.form-control,
+.form-select {
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    color: var(--text-white) !important;
+    padding: 0.875rem 1rem !important;
+    border-radius: 8px !important;
+    font-size: 1rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background: var(--bg-input) !important;
+    border-color: var(--danger) !important;
+    color: var(--text-white) !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    outline: none !important;
+}
+
+.form-control::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 0.8 !important;
+}
+
+.form-select option {
+    background: var(--bg-input) !important;
+    color: var(--text-white) !important;
+}
+
+/* Textarea Special Styling */
+textarea.form-control {
+    min-height: 120px !important;
+    resize: vertical !important;
+    line-height: 1.4 !important;
+}
+
+/* Blacklist Button */
+.btn-blacklist {
+    background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 700 !important;
+    padding: 1rem 2rem !important;
+    border-radius: 8px !important;
+    font-size: 1rem !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 3px 8px rgba(220, 53, 69, 0.3) !important;
+}
+
+.btn-blacklist:hover {
+    background: linear-gradient(135deg, #c82333 0%, var(--danger) 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 12px rgba(220, 53, 69, 0.4) !important;
+    color: white !important;
+}
+
+/* Blacklisted Users List */
+.blacklist-list-card {
+    background: var(--bg-card) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4) !important;
+    overflow: hidden;
+}
+
+.blacklist-list-card .card-body {
+    background: transparent !important;
+    color: var(--text-white) !important;
+    padding: 0 !important;
+}
+
+.blacklist-list-header {
+    background: var(--bg-input) !important;
+    border-bottom: 2px solid var(--border) !important;
+    padding: 1.5rem !important;
+}
+
+.blacklist-list-header h4 {
+    color: var(--text-white) !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 1.3rem !important;
+}
+
+.blacklist-count {
+    color: var(--danger) !important;
+    font-weight: 600 !important;
+    background: rgba(220, 53, 69, 0.1) !important;
+    padding: 0.3rem 0.8rem !important;
+    border-radius: 15px !important;
+    font-size: 0.85rem !important;
+    display: inline-block !important;
+    margin-top: 0.5rem !important;
+}
+
+/* Enhanced Table Styling */
+.table {
+    color: var(--text-white) !important;
+    margin-bottom: 0 !important;
+    background: transparent !important;
+}
+
+.table thead th {
+    background: var(--bg-input) !important;
+    color: var(--text-bright) !important;
+    border-bottom: 2px solid var(--border) !important;
+    border-top: none !important;
+    padding: 1.25rem !important;
+    font-weight: 700 !important;
+    font-size: 0.9rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.table tbody tr {
+    background: var(--bg-card) !important;
+    border-bottom: 1px solid var(--border) !important;
+    transition: all 0.3s ease !important;
+}
+
+.table tbody tr:hover {
+    background: var(--bg-table-row) !important;
+    transform: translateX(3px) !important;
+    box-shadow: inset 4px 0 0 var(--danger) !important;
+}
+
+.table tbody td {
+    color: var(--text-bright) !important;
+    border-top: 1px solid var(--border) !important;
+    padding: 1.25rem !important;
+    vertical-align: middle !important;
+}
+
+/* User Names with Black Text on White Background */
+.blacklisted-user-name {
+    color: var(--name-black) !important;
+    background: var(--text-white) !important;
+    font-weight: 800 !important;
+    font-size: 1rem !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 6px !important;
+    display: inline-block !important;
+    border: 1px solid var(--border) !important;
+    min-width: 180px !important;
+    text-align: center !important;
+}
+
+/* Blacklist Reason Styling */
+.blacklist-reason {
+    color: var(--text-muted) !important;
+    font-weight: 500 !important;
+    font-size: 0.9rem !important;
+    background: var(--bg-input) !important;
+    padding: 0.75rem !important;
+    border-radius: 6px !important;
+    border-left: 4px solid var(--danger) !important;
+    line-height: 1.4 !important;
+    max-width: 300px !important;
+}
+
+/* Remove Button */
+.btn-remove {
+    background: linear-gradient(135deg, var(--success) 0%, #218838 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 6px !important;
+    font-size: 0.85rem !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.3px !important;
+}
+
+.btn-remove:hover {
+    background: linear-gradient(135deg, #218838 0%, var(--success) 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 3px 8px rgba(40, 167, 69, 0.3) !important;
+    color: white !important;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center !important;
+    padding: 4rem 2rem !important;
+    background: var(--bg-input) !important;
+    border-radius: 8px !important;
+    margin: 2rem !important;
+}
+
+.empty-state i {
+    color: var(--success) !important;
+    font-size: 4rem !important;
+    margin-bottom: 1rem !important;
+}
+
+.empty-state h5 {
+    color: var(--text-white) !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.empty-state p {
+    color: var(--text-muted) !important;
+    margin-bottom: 0 !important;
+}
+
+/* Statistics Bar */
+.stats-bar {
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin-bottom: 1.5rem !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.stat-item {
+    text-align: center !important;
+}
+
+.stat-number {
+    color: var(--text-bright) !important;
+    font-size: 1.5rem !important;
+    font-weight: 800 !important;
+    display: block !important;
+}
+
+.stat-label {
+    color: var(--text-muted) !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .page-header h2 {
+        font-size: 1.3rem !important;
+    }
+    
+    .blacklist-form-card .card-body {
+        padding: 1.5rem !important;
+    }
+    
+    .blacklist-list-header {
+        padding: 1rem !important;
+        text-align: center;
+    }
+    
+    .table {
+        font-size: 0.85rem;
+    }
+    
+    .table thead th,
+    .table tbody td {
+        padding: 0.75rem 0.5rem !important;
+    }
+    
+    .blacklisted-user-name {
+        min-width: auto !important;
+        font-size: 0.9rem !important;
+        padding: 0.4rem 0.8rem !important;
+    }
+    
+    .blacklist-reason {
+        max-width: none !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .btn-remove {
+        font-size: 0.75rem !important;
+        padding: 0.4rem 0.8rem !important;
+    }
+    
+    .stats-bar {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+/* Loading Animation */
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<!-- Page Header -->
+<div class="page-header">
+    <div class="text-center">
+        <h2><i class="bi bi-person-fill-slash me-2"></i>BLACKLIST MANAGEMENT</h2>
+        <p class="page-subtitle">Restrict visitor access for security and safety purposes</p>
+    </div>
+</div>
+
+<!-- Security Warning -->
+<div class="security-warning">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <strong>Security Notice:</strong> Blacklisting prevents users from scheduling visits and accessing the facility. Use this feature responsibly and document all reasons thoroughly for audit purposes.
+</div>
+
+<!-- Statistics Bar -->
+<div class="stats-bar">
+    <div class="stat-item">
+        <span class="stat-number">{{ blacklisted_users|length }}</span>
+        <div class="stat-label">Blacklisted</div>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">{{ non_blacklisted_users|length }}</span>
+        <div class="stat-label">Active Users</div>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">100%</span>
+        <div class="stat-label">Security Level</div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Add to Blacklist Form -->
+    <div class="col-md-4">
+        <div class="card blacklist-form-card fade-in">
+            <div class="card-header">
+                <h4><i class="bi bi-person-fill-slash me-2"></i>BLACKLIST USER</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'add_to_blacklist' %}" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="user_id" class="form-label">
+                            <i class="bi bi-person-x me-2"></i>Select Visitor
+                        </label>
+                        <select name="user_id" id="user_id" class="form-select" required>
+                            <option value="">-- Choose a Visitor to Blacklist --</option>
+                            {% for user in non_blacklisted_users %}
+                                <option value="{{ user.id }}">
+                                    {{ user.full_name|default:user.username }}
+                                    {% if user.email %} ({{ user.email }}){% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">Please select a visitor to blacklist.</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="reason" class="form-label">
+                            <i class="bi bi-journal-text me-2"></i>Blacklist Reason
+                        </label>
+                        <textarea name="reason" 
+                                  id="reason" 
+                                  class="form-control" 
+                                  rows="4" 
+                                  placeholder="Enter detailed reason for blacklisting this visitor..."
+                                  required></textarea>
+                        <small class="form-text text-muted">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Provide specific details for audit and legal purposes.
+                        </small>
+                        <div class="invalid-feedback">Please provide a reason for blacklisting.</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-blacklist w-100" id="blacklistBtn">
+                        <i class="bi bi-person-fill-slash me-2"></i>Add to Blacklist
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blacklisted Users List -->
+    <div class="col-md-8">
+        <div class="card blacklist-list-card fade-in">
+            <div class="blacklist-list-header">
+                <h4><i class="bi bi-list-ul me-2"></i>Blacklisted Visitors</h4>
+                <div class="blacklist-count">
+                    <i class="bi bi-person-fill-slash me-1"></i>
+                    {{ blacklisted_users|length }} User{{ blacklisted_users|length|pluralize }} Restricted
+                </div>
+            </div>
+            
+            <div class="card-body">
+                {% if blacklisted_users %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th><i class="bi bi-person me-2"></i>Visitor</th>
+                                <th><i class="bi bi-journal-text me-2"></i>Reason</th>
+                                <th class="text-end"><i class="bi bi-gear me-2"></i>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in blacklisted_users %}
+                            <tr data-blacklist-id="{{ entry.pk }}">
+                                <td>
+                                    <div class="blacklisted-user-name" style="color: #000000 !important; background: #ffffff !important;">
+                                        {{ entry.user.full_name|default:entry.user.username }}
+                                    </div>
+                                    {% if entry.user.email %}
+                                        <small class="d-block mt-1 text-muted">
+                                            <i class="bi bi-envelope me-1"></i>{{ entry.user.email }}
+                                        </small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="blacklist-reason">
+                                        {{ entry.reason|truncatewords:15 }}
+                                        {% if entry.reason|length > 100 %}
+                                            <a href="#" class="text-primary" onclick="showFullReason('{{ entry.reason|escapejs }}')">
+                                                ...read more
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    {% if entry.created_at %}
+                                        <small class="text-muted d-block mt-1">
+                                            <i class="bi bi-calendar3 me-1"></i>
+                                            Blacklisted: {{ entry.created_at|date:"M d, Y" }}
+                                        </small>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a href="{% url 'remove_from_blacklist' entry.pk %}" 
+                                       class="btn btn-remove"
+                                       onclick="return confirm('Are you sure you want to remove {{ entry.user.full_name|default:entry.user.username }} from the blacklist? They will regain access to schedule visits.')">
+                                        <i class="bi bi-person-check me-1"></i>Restore
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <!-- Empty State -->
+                <div class="empty-state">
+                    <i class="bi bi-shield-check"></i>
+                    <h5>No Blacklisted Users</h5>
+                    <p>All visitors currently have access to the facility. Use the form on the left to restrict access if needed.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Full Reason Display -->
+<div class="modal fade" id="reasonModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title">Blacklist Reason</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="fullReasonText"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add fade-in animation
+    const fadeElements = document.querySelectorAll('.fade-in');
+    fadeElements.forEach((element, index) => {
+        setTimeout(() => {
+            element.style.opacity = '1';
+        }, index * 200);
+    });
+
+    // Form validation and submission
+    const form = document.querySelector('form');
+    const blacklistBtn = document.getElementById('blacklistBtn');
+    
+    if (form && blacklistBtn) {
+        form.addEventListener('submit', function(e) {
+            const userId = document.getElementById('user_id').value;
+            const reason = document.getElementById('reason').value.trim();
+            
+            // Basic validation
+            if (!userId || !reason) {
+                e.preventDefault();
+                alert('Please select a user and provide a reason for blacklisting.');
+                return false;
+            }
+            
+            if (reason.length < 10) {
+                e.preventDefault();
+                alert('Please provide a more detailed reason (minimum 10 characters).');
+                return false;
+            }
+            
+            // Confirmation dialog
+            const selectedUser = document.getElementById('user_id').selectedOptions[0].text;
+            if (!confirm(`Are you sure you want to blacklist ${selectedUser}? This will prevent them from scheduling any visits.`)) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Show loading state
+            blacklistBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Adding to Blacklist...';
+            blacklistBtn.disabled = true;
+            
+            // Re-enable after timeout (in case of errors)
+            setTimeout(() => {
+                blacklistBtn.innerHTML = '<i class="bi bi-person-fill-slash me-2"></i>Add to Blacklist';
+                blacklistBtn.disabled = false;
+            }, 8000);
+        });
+    }
+
+    // Force name visibility on blacklisted users
+    const blacklistedNames = document.querySelectorAll('.blacklisted-user-name');
+    blacklistedNames.forEach(name => {
+        name.style.color = '#000000';
+        name.style.background = '#ffffff';
+        name.style.fontWeight = '800';
+        name.style.fontSize = '1rem';
+        name.style.padding = '0.5rem 1rem';
+        name.style.borderRadius = '6px';
+        name.style.display = 'inline-block';
+        name.style.border = '1px solid #555';
+        name.style.minWidth = '180px';
+        name.style.textAlign = 'center';
+    });
+
+    // Enhanced row hover effects
+    const tableRows = document.querySelectorAll('tbody tr[data-blacklist-id]');
+    tableRows.forEach((row, index) => {
+        // Stagger animation
+        row.style.animationDelay = `${index * 0.1}s`;
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.borderLeft = '4px solid var(--danger)';
+            this.style.paddingLeft = '12px';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.borderLeft = 'none';
+            this.style.paddingLeft = '16px';
+        });
+    });
+
+    // Remove button click animation
+    const removeButtons = document.querySelectorAll('.btn-remove');
+    removeButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const confirmed = confirm('Are you sure you want to restore access for this user?');
+            if (confirmed) {
+                this.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Restoring...';
+                this.disabled = true;
+            } else {
+                e.preventDefault();
+            }
+        });
+    });
+
+    // Animate statistics numbers
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(stat => {
+        const finalValue = parseInt(stat.textContent);
+        if (!isNaN(finalValue) && finalValue > 0) {
+            stat.textContent = '0';
+            let current = 0;
+            const increment = Math.max(1, Math.ceil(finalValue / 10));
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= finalValue) {
+                    current = finalValue;
+                    clearInterval(timer);
+                }
+                stat.textContent = current;
+            }, 150);
+        }
+    });
+});
+
+// Show full reason in modal
+function showFullReason(reason) {
+    document.getElementById('fullReasonText').textContent = reason;
+    const modal = new bootstrap.Modal(document.getElementById('reasonModal'));
+    modal.show();
+}
+
+// Prevent double submission
+let isSubmitting = false;
+document.addEventListener('submit', function(e) {
+    if (isSubmitting) {
+        e.preventDefault();
+        return false;
+    }
+    isSubmitting = true;
+    
+    setTimeout(() => {
+        isSubmitting = false;
+    }, 3000);
+});
+</script>
+{% endblock %}

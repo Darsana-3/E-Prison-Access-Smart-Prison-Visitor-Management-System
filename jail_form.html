@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{% if form.instance.pk %}Update Jail{% else %}Create Jail{% endif %}{% endblock %}
+
+{% block content %}
+<div class="col-md-6 mx-auto">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h4>{% if form.instance.pk %}Update Jail{% else %}Create New Jail{% endif %}</h4>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">{% if form.instance.pk %}Update{% else %}Create{% endif %}</button>
+                <a href="{% url 'jail_list' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

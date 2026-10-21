@@ -1,0 +1,675 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<style>
+/* Dark Prison Theme - Admin Dashboard with Jail Selector */
+:root {
+    --bg-dark: #1a1a1a;
+    --bg-card: #2d2d2d;
+    --bg-input: #404040;
+    --bg-accent: #363636;
+    --border: #555;
+    --text-white: #ffffff;
+    --text-light: #f0f0f0;
+    --text-muted: #cccccc;
+    --text-gray: #999999;
+    --primary: #0066cc;
+    --success: #28a745;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --info: #17a2b8;
+}
+
+body {
+    background: var(--bg-dark) !important;
+    color: var(--text-white) !important;
+}
+
+/* =====================
+   JAIL SELECTOR STYLES
+   ===================== */
+.jail-selector-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.jail-selector-label {
+    font-size: 0.8rem;
+    color: var(--text-gray);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
+}
+
+.jail-dropdown-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    color: var(--text-white) !important;
+    padding: 0.5rem 2.5rem 0.5rem 1rem !important;
+    border-radius: 25px !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    min-width: 200px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.85rem center !important;
+}
+
+.jail-dropdown-select:hover {
+    border-color: var(--primary) !important;
+    background-color: var(--bg-accent) !important;
+}
+
+.jail-dropdown-select:focus {
+    outline: none !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.25) !important;
+}
+
+.jail-dropdown-select option {
+    background: var(--bg-card);
+    color: var(--text-white);
+    padding: 0.5rem;
+}
+
+/* Spinner shown while metrics reload */
+.metrics-loading-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(26, 26, 26, 0.65);
+    border-radius: 12px;
+    z-index: 10;
+    align-items: center;
+    justify-content: center;
+}
+.metrics-loading-overlay.show {
+    display: flex;
+}
+.metrics-row-wrapper {
+    position: relative;
+}
+
+/* Active jail badge (shown in header subtitle area) */
+.active-jail-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(0, 102, 204, 0.15);
+    border: 1px solid rgba(0, 102, 204, 0.4);
+    color: #66aaff;
+    padding: 0.3rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 0.4rem;
+}
+
+/* =====================
+   EMERGENCY ALERT
+   ===================== */
+.emergency-alert-dashboard {
+    background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%);
+    border: 3px solid #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    color: white;
+    animation: emergency-pulse 2s infinite;
+    box-shadow: 0 8px 20px rgba(220, 53, 69, 0.6);
+}
+
+@keyframes emergency-pulse {
+    0%, 100% { box-shadow: 0 8px 20px rgba(220, 53, 69, 0.6); transform: scale(1); }
+    50%       { box-shadow: 0 12px 25px rgba(220, 53, 69, 0.8); transform: scale(1.02); }
+}
+
+.emergency-alert-dashboard h4 {
+    color: white !important; font-weight: 800 !important;
+    margin-bottom: 1rem !important; font-size: 1.3rem !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.emergency-message-dashboard {
+    background: rgba(255,255,255,0.1); padding: 1rem;
+    border-radius: 8px; margin: 1rem 0;
+    font-family: monospace; font-size: 1rem;
+    line-height: 1.4; border-left: 4px solid #fff;
+}
+
+.emergency-controls {
+    margin-top: 1.5rem; display: flex;
+    justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1rem;
+}
+.emergency-info { font-size: 0.9rem; opacity: 0.9; }
+
+/* Quick Emergency Broadcast */
+.quick-emergency {
+    background: var(--bg-card); border: 2px solid var(--danger);
+    border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+.quick-emergency h5 { color: var(--danger) !important; font-weight: 700 !important; margin-bottom: 1rem !important; }
+.quick-emergency textarea {
+    background: var(--bg-input) !important; border: 2px solid var(--border) !important;
+    color: var(--text-white) !important; resize: vertical; min-height: 80px;
+}
+.quick-emergency textarea:focus {
+    border-color: var(--danger) !important;
+    box-shadow: 0 0 0 0.2rem rgba(220,53,69,0.25) !important;
+}
+.btn-emergency {
+    background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%);
+    border: none; color: white; font-weight: 700;
+    padding: 0.75rem 1.5rem; border-radius: 6px;
+    text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.3s ease;
+}
+.btn-emergency:hover {
+    background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
+    transform: translateY(-2px); box-shadow: 0 6px 15px rgba(220,53,69,0.4); color: white;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+    background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-accent) 100%);
+    border: 2px solid var(--border); border-radius: 12px;
+    padding: 2rem; margin-bottom: 2rem;
+    border-top: 4px solid var(--primary);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.dashboard-header h2 {
+    color: var(--text-white) !important; font-weight: 700;
+    margin-bottom: 0.5rem !important; font-size: 1.8rem;
+}
+.dashboard-subtitle {
+    color: var(--text-light) !important; font-size: 1rem !important;
+    font-weight: 500 !important; margin-bottom: 0 !important; opacity: 0.9;
+}
+
+/* Metric Cards */
+.metric-card {
+    background: var(--bg-card) !important; border: 2px solid var(--border) !important;
+    border-radius: 12px !important; box-shadow: 0 6px 12px rgba(0,0,0,0.4) !important;
+    transition: all 0.3s ease; position: relative; overflow: hidden;
+}
+.metric-card::before {
+    content: ''; position: absolute; top: 0; left: 0;
+    width: 100%; height: 3px; background: var(--primary); opacity: 0; transition: opacity 0.3s ease;
+}
+.metric-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.5) !important; border-color: var(--primary); }
+.metric-card:hover::before { opacity: 1; }
+.metric-card .card-body { background: transparent; color: var(--text-white); padding: 1.75rem; }
+
+.metric-icon {
+    width: 65px; height: 65px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin-right: 1.25rem; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+.metric-icon.warning  { background: linear-gradient(135deg, var(--warning) 0%, #e0a800 100%); color: #000; }
+.metric-icon.info     { background: linear-gradient(135deg, var(--info) 0%, #138496 100%); color: white; }
+.metric-icon.success  { background: linear-gradient(135deg, var(--success) 0%, #218838 100%); color: white; }
+.metric-icon.danger   { background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%); color: white; }
+.metric-icon.primary  { background: linear-gradient(135deg, var(--primary) 0%, #0056b3 100%); color: white; }
+.metric-icon.emergency {
+    background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%);
+    color: white; animation: emergency-glow 2s infinite;
+}
+@keyframes emergency-glow {
+    0%, 100% { box-shadow: 0 4px 8px rgba(220,53,69,0.4); }
+    50%       { box-shadow: 0 6px 15px rgba(220,53,69,0.8); }
+}
+
+.metric-title {
+    color: var(--text-muted) !important; font-size: 0.85rem !important;
+    font-weight: 600 !important; margin-bottom: 0.5rem !important;
+    text-transform: uppercase !important; letter-spacing: 1px !important;
+}
+.metric-value  { color: var(--text-white) !important; font-size: 2.25rem !important; font-weight: 700 !important; margin: 0 !important; line-height: 1.1 !important; }
+.metric-status { color: var(--text-white) !important; font-size: 1.2rem !important; font-weight: 600 !important; margin: 0 !important; }
+
+/* System Status */
+.system-status { display: flex; align-items: center; gap: 0.5rem; }
+.status-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+/* Management Panel */
+.management-section {
+    background: var(--bg-card); border: 2px solid var(--border);
+    border-radius: 12px; padding: 2rem; margin-top: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.management-section h3 {
+    color: var(--text-white) !important; font-weight: 700 !important;
+    margin-bottom: 1.5rem !important; border-bottom: 2px solid var(--border) !important;
+    padding-bottom: 0.75rem !important; font-size: 1.3rem !important;
+}
+.management-item {
+    background: linear-gradient(135deg, var(--bg-input) 0%, var(--bg-accent) 100%) !important;
+    border: 2px solid var(--border) !important; color: var(--text-white) !important;
+    padding: 1.5rem !important; margin-bottom: 0.75rem !important;
+    border-radius: 10px !important; transition: all 0.3s ease !important;
+    text-decoration: none !important; display: flex !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.management-item:hover {
+    background: linear-gradient(135deg, var(--bg-accent) 0%, var(--bg-input) 100%) !important;
+    border-color: var(--primary) !important; color: var(--text-white) !important;
+    transform: translateX(8px) !important; text-decoration: none !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+    border-left: 4px solid var(--primary) !important;
+}
+.management-item:last-child { margin-bottom: 0 !important; }
+.item-icon  { color: var(--primary) !important; font-size: 1.3rem !important; margin-right: 1rem !important; min-width: 20px !important; }
+.item-title { color: var(--text-white) !important; font-weight: 600 !important; margin-bottom: 0.25rem !important; font-size: 1rem !important; }
+.item-description { color: var(--text-muted) !important; font-size: 0.85rem !important; margin: 0 !important; line-height: 1.3 !important; }
+.chevron   { color: var(--text-muted) !important; font-size: 1.2rem !important; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-header { padding: 1.5rem; }
+    .dashboard-header h2 { font-size: 1.5rem; }
+    .jail-selector-wrapper { flex-wrap: wrap; }
+    .jail-dropdown-select { min-width: 160px; }
+    .metric-value { font-size: 1.8rem !important; }
+    .management-section { padding: 1.5rem; }
+}
+</style>
+
+<!-- ============================================================
+     ACTIVE EMERGENCY ALERT (if any)
+     ============================================================ -->
+{% if active_alert %}
+<div class="emergency-alert-dashboard">
+    <h4>
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        🚨 ACTIVE FACILITY EMERGENCY ALERT 🚨
+    </h4>
+    <div class="emergency-message-dashboard">{{ active_alert.message }}</div>
+    <div class="emergency-controls">
+        <div class="emergency-info">
+            <i class="bi bi-person me-1"></i>Issued by: {{ active_alert.issued_by.get_full_name|default:active_alert.issued_by.username }}
+            <span class="ms-3"><i class="bi bi-clock me-1"></i>{{ active_alert.issued_at|date:"M d, Y H:i" }}</span>
+        </div>
+        <a href="{% url 'deactivate_alert' active_alert.pk %}"
+           class="btn btn-light btn-sm"
+           onclick="return confirm('Deactivate this emergency alert? This will remove it from all screens immediately.')">
+            <i class="bi bi-x-circle me-1"></i>Deactivate Alert
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<!-- ============================================================
+     QUICK EMERGENCY BROADCAST (if no active alert)
+     ============================================================ -->
+{% if not active_alert %}
+<div class="quick-emergency">
+    <h5>
+        <i class="bi bi-broadcast me-2"></i>
+        Quick Emergency Broadcast
+    </h5>
+    <form method="post" action="{% url 'manage_alerts' %}" id="quickEmergencyForm">
+        {% csrf_token %}
+        <div class="row align-items-end">
+            <div class="col-md-8 mb-3">
+                <textarea name="message"
+                          class="form-control"
+                          placeholder="Enter emergency message (e.g., LOCKDOWN IN EFFECT - ALL STAFF REPORT TO STATIONS)"
+                          rows="2"
+                          required
+                          id="quickEmergencyMessage"></textarea>
+            </div>
+            <div class="col-md-4 mb-3">
+                <button type="submit" class="btn btn-emergency w-100">
+                    <i class="bi bi-broadcast me-2"></i>Broadcast Now
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+<!-- ============================================================
+     DASHBOARD HEADER  (with Jail Selector Dropdown)
+     ============================================================ -->
+<div class="dashboard-header">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+
+        <!-- Left: Title + active jail badge -->
+        <div>
+            <h2><i class="bi bi-speedometer2 me-3"></i>ADMIN DASHBOARD</h2>
+            <p class="dashboard-subtitle">Prison Management Control Center</p>
+            <!-- Shows which jail metrics are currently scoped to -->
+            <div class="active-jail-badge mt-2" id="activeJailBadge">
+                <i class="bi bi-building"></i>
+                <span id="activeJailName">{{ selected_jail.name|default:"All Facilities" }}</span>
+            </div>
+        </div>
+
+        <!-- Right: Jail Selector -->
+        <div class="d-flex flex-column align-items-end gap-2">
+            <div class="jail-selector-wrapper">
+                <span class="jail-selector-label">
+                    <i class="bi bi-funnel-fill me-1"></i>View Facility
+                </span>
+                <select class="jail-dropdown-select" id="jailSelector" onchange="switchJail(this.value)">
+                    <option value="" {% if not selected_jail_id %}selected{% endif %}>
+                        — All Facilities —
+                    </option>
+                    {% for jail in all_jails %}
+                    <option value="{{ jail.id }}"
+                        {% if selected_jail_id == jail.id %}selected{% endif %}>
+                        {{ jail.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <!-- Small hint text -->
+            <small style="color: var(--text-gray); font-size: 0.75rem;">
+                <i class="bi bi-info-circle me-1"></i>Metrics update automatically on selection
+            </small>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============================================================
+     METRIC CARDS  (wrapped for loading-overlay positioning)
+     ============================================================ -->
+<div class="metrics-row-wrapper">
+    <!-- Loading overlay shown during AJAX reload -->
+    <div class="metrics-loading-overlay" id="metricsLoader">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <div class="row" id="metricsRow">
+
+        <!-- Pending Requests -->
+        <div class="col-lg-6 col-xl-3 mb-4">
+            <div class="card metric-card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="metric-icon warning">
+                        <i class="bi bi-clock-history fs-2"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="metric-title">Pending Requests</div>
+                        <div class="metric-value" id="metricPending">{{ pending_visits_count|default:0 }}</div>
+                    </div>
+                    <a href="{% url 'review_visits' %}" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Staff -->
+        <div class="col-lg-6 col-xl-3 mb-4">
+            <div class="card metric-card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="metric-icon info">
+                        <i class="bi bi-person-badge fs-2"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="metric-title">Security Staff</div>
+                        <div class="metric-value" id="metricStaff">{{ active_staff_count|default:0 }}</div>
+                    </div>
+                    <a href="{% url 'manage_security_staff' %}" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emergency Alerts -->
+        <div class="col-lg-6 col-xl-3 mb-4">
+            <div class="card metric-card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="metric-icon emergency">
+                        <i class="bi bi-broadcast fs-2"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="metric-title">Emergency Alerts</div>
+                        <div class="metric-value">{% if active_alert %}1{% else %}0{% endif %}</div>
+                    </div>
+                    <a href="{% url 'manage_alerts' %}" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="col-lg-6 col-xl-3 mb-4">
+            <div class="card metric-card h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="metric-icon success">
+                        <i class="bi bi-shield-check fs-2"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="metric-title">System Status</div>
+                        <div class="system-status">
+                            <span class="status-dot"></span>
+                            <div class="metric-status">ONLINE</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /#metricsRow -->
+</div><!-- /.metrics-row-wrapper -->
+
+<!-- ============================================================
+     MANAGEMENT PANELS
+     ============================================================ -->
+<div class="management-section">
+    <h3><i class="bi bi-gear-fill me-2"></i>MANAGEMENT PANELS</h3>
+
+    <div class="management-list">
+
+        <a href="{% url 'review_visits' %}" class="management-item justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-clipboard-check-fill item-icon"></i>
+                <div>
+                    <div class="item-title">Review Visit Requests</div>
+                    <div class="item-description">Approve or deny pending visitor requests and manage visit schedules</div>
+                </div>
+            </div>
+            <i class="bi bi-chevron-right chevron"></i>
+        </a>
+
+        <a href="{% url 'prisoner_list' %}" class="management-item justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-person-fill-lock item-icon"></i>
+                <div>
+                    <div class="item-title">Prisoner Records</div>
+                    <div class="item-description">View and manage all inmates in your facility database</div>
+                </div>
+            </div>
+            <i class="bi bi-chevron-right chevron"></i>
+        </a>
+
+        <a href="{% url 'manage_security_staff' %}" class="management-item justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-person-badge item-icon"></i>
+                <div>
+                    <div class="item-title">Security Staff Management</div>
+                    <div class="item-description">Create and manage security personnel accounts and permissions</div>
+                </div>
+            </div>
+            <i class="bi bi-chevron-right chevron"></i>
+        </a>
+
+        <a href="{% url 'blacklist_list' %}" class="management-item justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-person-fill-slash item-icon"></i>
+                <div>
+                    <div class="item-title">Blacklist Management</div>
+                    <div class="item-description">Ban or restore visitor access and manage security restrictions</div>
+                </div>
+            </div>
+            <i class="bi bi-chevron-right chevron"></i>
+        </a>
+
+        <a href="{% url 'manage_alerts' %}" class="management-item justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-broadcast item-icon"></i>
+                <div>
+                    <div class="item-title">Emergency Alert System</div>
+                    <div class="item-description">Broadcast urgent messages and manage emergency notifications</div>
+                </div>
+            </div>
+            <i class="bi bi-chevron-right chevron"></i>
+        </a>
+
+        <a href="{% url 'jail_list' %}" class="management-item justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-building-gear item-icon"></i>
+                <div>
+                    <div class="item-title">Facility Configuration</div>
+                    <div class="item-description">Configure facilities and system-wide operational parameters</div>
+                </div>
+            </div>
+            <i class="bi bi-chevron-right chevron"></i>
+        </a>
+
+    </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* ── Quick Emergency Form ── */
+    const quickEmergencyForm    = document.getElementById('quickEmergencyForm');
+    const quickEmergencyMessage = document.getElementById('quickEmergencyMessage');
+
+    if (quickEmergencyForm) {
+        quickEmergencyForm.addEventListener('submit', function (e) {
+            const message = quickEmergencyMessage.value.trim();
+            if (!message || message.length < 10) {
+                e.preventDefault();
+                alert('Please provide a detailed emergency message (minimum 10 characters).');
+                quickEmergencyMessage.focus();
+                return false;
+            }
+            if (!confirm('🚨 EMERGENCY ALERT CONFIRMATION 🚨\n\nBroadcast to ALL staff?\n\n"' + message + '"\n\nThis will immediately notify all logged-in personnel.')) {
+                e.preventDefault();
+                return false;
+            }
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Broadcasting...';
+            submitBtn.disabled = true;
+        });
+    }
+
+    /* ── Metric card hover ── */
+    document.querySelectorAll('.metric-card').forEach(card => {
+        card.addEventListener('mouseenter', () => card.style.borderColor = 'var(--primary)');
+        card.addEventListener('mouseleave', () => card.style.borderColor = 'var(--border)');
+        card.addEventListener('click', function () {
+            this.style.transform = 'translateY(-2px) scale(0.98)';
+            setTimeout(() => this.style.transform = '', 150);
+        });
+    });
+
+    /* ── Management item hover ── */
+    document.querySelectorAll('.management-item').forEach(item => {
+        item.addEventListener('mouseenter', function () {
+            const icon = this.querySelector('.item-icon');
+            if (icon) { icon.style.transform = 'scale(1.2)'; icon.style.color = '#66bbff'; }
+        });
+        item.addEventListener('mouseleave', function () {
+            const icon = this.querySelector('.item-icon');
+            if (icon) { icon.style.transform = 'scale(1)';   icon.style.color = 'var(--primary)'; }
+        });
+    });
+
+    /* ── Animate metric value counters ── */
+    animateMetrics();
+});
+
+/* ──────────────────────────────────────────────────
+   animateMetrics()  – count-up effect on numbers
+────────────────────────────────────────────────── */
+function animateMetrics() {
+    document.querySelectorAll('.metric-value').forEach(el => {
+        const finalValue = parseInt(el.textContent, 10);
+        if (!isNaN(finalValue) && finalValue > 0) {
+            el.textContent = '0';
+            let current   = 0;
+            const step    = Math.max(1, Math.ceil(finalValue / 30));
+            const timer   = setInterval(() => {
+                current += step;
+                if (current >= finalValue) { current = finalValue; clearInterval(timer); }
+                el.textContent = current;
+            }, 50);
+        }
+    });
+}
+
+/* ──────────────────────────────────────────────────
+   switchJail()  – called by the dropdown onchange
+   Fetches updated metrics via AJAX without a full
+   page reload, so the user stays in place.
+────────────────────────────────────────────────── */
+function switchJail(jailId) {
+    const loader       = document.getElementById('metricsLoader');
+    const badgeName    = document.getElementById('activeJailName');
+    const pendingEl    = document.getElementById('metricPending');
+    const staffEl      = document.getElementById('metricStaff');
+    const selectedText = document.getElementById('jailSelector').selectedOptions[0].text.trim();
+
+    /* Show spinner */
+    loader.classList.add('show');
+
+    /* Update the badge label immediately */
+    badgeName.textContent = jailId ? selectedText : 'All Facilities';
+
+    /* Build URL – your view reads ?jail_id=<id> */
+    const url = `{% url 'dashboard_metrics_api' %}?jail_id=${jailId}`;
+
+    fetch(url, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Network response was not ok');
+        return res.json();
+    })
+    .then(data => {
+        /* Snap values to 0 then animate up */
+        if (pendingEl) pendingEl.textContent = '0';
+        if (staffEl)   staffEl.textContent   = '0';
+
+        setTimeout(() => {
+            if (pendingEl) animateValue(pendingEl, data.pending_visits_count ?? 0);
+            if (staffEl)   animateValue(staffEl,   data.active_staff_count   ?? 0);
+        }, 80);
+    })
+    .catch(err => {
+        console.error('Jail switch error:', err);
+    })
+    .finally(() => {
+        loader.classList.remove('show');
+    });
+}
+
+function animateValue(el, finalValue) {
+    if (finalValue === 0) { el.textContent = '0'; return; }
+    let current = 0;
+    const step  = Math.max(1, Math.ceil(finalValue / 30));
+    const timer = setInterval(() => {
+        current += step;
+        if (current >= finalValue) { current = finalValue; clearInterval(timer); }
+        el.textContent = current;
+    }, 50);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,592 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Prisoner Records{% endblock %}
+
+{% block content %}
+<style>
+/* Same CSS styles as your original template - keeping them unchanged */
+:root {
+    --bg-dark: #1a1a1a;
+    --bg-card: #2d2d2d;
+    --bg-input: #404040;
+    --bg-accent: #363636;
+    --bg-table-row: #333333;
+    --border: #555;
+    --text-white: #ffffff;
+    --text-bright: #f8f9fa;
+    --text-light: #e9ecef;
+    --text-muted: #d1d5db;
+    --text-gray: #9ca3af;
+    --name-black: #000000;
+    --primary: #0066cc;
+    --success: #28a745;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --info: #17a2b8;
+}
+
+body {
+    background: var(--bg-dark) !important;
+    color: var(--text-white) !important;
+}
+
+/* All your existing CSS styles remain the same */
+.page-header {
+    background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-accent) 100%);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-top: 4px solid var(--info);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.page-header h2 {
+    color: var(--text-white) !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 1.6rem !important;
+}
+
+.facility-name {
+    color: var(--text-light) !important;
+    font-size: 0.95rem !important;
+    margin-bottom: 0 !important;
+    opacity: 0.9;
+}
+
+.btn-add-prisoner {
+    background: linear-gradient(135deg, var(--success) 0%, #218838 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 8px !important;
+    font-size: 0.95rem !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3) !important;
+}
+
+.btn-add-prisoner:hover {
+    background: linear-gradient(135deg, #218838 0%, var(--success) 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4) !important;
+    color: white !important;
+}
+
+.records-card {
+    background: var(--bg-card) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4) !important;
+    overflow: hidden;
+}
+
+.records-card .card-body {
+    background: transparent !important;
+    color: var(--text-white) !important;
+    padding: 0 !important;
+}
+
+.table {
+    color: var(--text-white) !important;
+    margin-bottom: 0 !important;
+    background: transparent !important;
+}
+
+.table thead th {
+    background: var(--bg-input) !important;
+    color: var(--text-bright) !important;
+    border-bottom: 2px solid var(--border) !important;
+    border-top: none !important;
+    padding: 1.25rem !important;
+    font-weight: 700 !important;
+    font-size: 0.9rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.table tbody tr {
+    background: var(--bg-card) !important;
+    border-bottom: 1px solid var(--border) !important;
+    transition: all 0.3s ease !important;
+}
+
+.table tbody tr:hover {
+    background: var(--bg-table-row) !important;
+    transform: translateX(3px) !important;
+    box-shadow: inset 4px 0 0 var(--info) !important;
+}
+
+.table tbody td {
+    color: var(--text-bright) !important;
+    border-top: 1px solid var(--border) !important;
+    padding: 1.25rem !important;
+    vertical-align: middle !important;
+}
+
+.prisoner-id {
+    color: var(--name-black) !important;
+    background: var(--text-white) !important;
+    font-weight: 800 !important;
+    font-size: 1rem !important;
+    padding: 0.4rem 0.8rem !important;
+    border-radius: 6px !important;
+    display: inline-block !important;
+    font-family: 'Courier New', monospace !important;
+    letter-spacing: 1px !important;
+    border: 1px solid var(--border) !important;
+}
+
+.prisoner-name {
+    color: var(--name-black) !important;
+    background: var(--text-white) !important;
+    font-weight: 800 !important;
+    font-size: 1.1rem !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 6px !important;
+    display: inline-block !important;
+    border: 1px solid var(--border) !important;
+    min-width: 200px !important;
+    text-align: center !important;
+}
+
+.dob-info {
+    color: var(--text-muted) !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    background: var(--bg-input) !important;
+    padding: 0.4rem 0.8rem !important;
+    border-radius: 8px !important;
+    display: inline-block !important;
+}
+
+.btn-view-details {
+    background: linear-gradient(135deg, var(--primary) 0%, #0056b3 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 6px !important;
+    font-size: 0.85rem !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.3px !important;
+}
+
+.btn-view-details:hover {
+    background: linear-gradient(135deg, #0056b3 0%, var(--primary) 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 3px 8px rgba(0, 102, 204, 0.3) !important;
+    color: white !important;
+}
+
+.btn-view-details i {
+    margin-right: 0.5rem !important;
+}
+
+.empty-state {
+    text-align: center !important;
+    padding: 4rem 2rem !important;
+    background: var(--bg-input) !important;
+    border-radius: 8px !important;
+    margin: 2rem !important;
+}
+
+.empty-state i {
+    color: var(--text-gray) !important;
+    font-size: 4rem !important;
+    margin-bottom: 1rem !important;
+}
+
+.empty-state h4 {
+    color: var(--text-bright) !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.empty-state p {
+    color: var(--text-muted) !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.empty-state .btn {
+    margin-top: 1rem !important;
+}
+
+.stats-summary {
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin-bottom: 1.5rem !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.stat-item {
+    text-align: center !important;
+}
+
+.stat-number {
+    color: var(--text-bright) !important;
+    font-size: 1.5rem !important;
+    font-weight: 800 !important;
+    display: block !important;
+}
+
+.stat-label {
+    color: var(--text-muted) !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.search-section {
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 8px !important;
+    padding: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.search-section h6 {
+    color: var(--text-bright) !important;
+    font-weight: 600 !important;
+    margin-bottom: 1rem !important;
+}
+
+.form-control {
+    background: var(--bg-card) !important;
+    border: 2px solid var(--border) !important;
+    color: var(--text-white) !important;
+    border-radius: 6px !important;
+}
+
+.form-control:focus {
+    background: var(--bg-card) !important;
+    border-color: var(--primary) !important;
+    color: var(--text-white) !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25) !important;
+}
+
+.form-control::placeholder {
+    color: var(--text-muted) !important;
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .page-header h2 {
+        font-size: 1.3rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .btn-add-prisoner {
+        width: 100% !important;
+        margin-top: 1rem !important;
+    }
+    
+    .table {
+        font-size: 0.85rem;
+    }
+    
+    .table thead th,
+    .table tbody td {
+        padding: 0.75rem 0.5rem !important;
+    }
+    
+    .prisoner-name {
+        min-width: auto !important;
+        font-size: 1rem !important;
+        padding: 0.4rem 0.8rem !important;
+    }
+    
+    .prisoner-id {
+        font-size: 0.9rem !important;
+        padding: 0.3rem 0.6rem !important;
+    }
+    
+    .btn-view-details {
+        font-size: 0.75rem !important;
+        padding: 0.4rem 0.8rem !important;
+    }
+    
+    .stats-summary {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .empty-state {
+        padding: 2rem 1rem !important;
+        margin: 1rem !important;
+    }
+}
+
+.table-loading {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<!-- Page Header -->
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+            <h2><i class="bi bi-people-fill me-2"></i>PRISONER RECORDS</h2>
+            <p class="facility-name">{{ jail.name }} - Inmate Management System</p>
+        </div>
+        <a href="{% url 'prisoner_create' %}" class="btn btn-add-prisoner">
+            <i class="bi bi-person-plus-fill me-2"></i>Add New Prisoner
+        </a>
+    </div>
+</div>
+
+<!-- Statistics Summary -->
+<div class="stats-summary">
+    <div class="stat-item">
+        <span class="stat-number">{{ prisoners|length }}</span>
+        <div class="stat-label">Total Prisoners</div>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">-</span>
+        <div class="stat-label">Active Cases</div>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">-</span>
+        <div class="stat-label">Recent Admissions</div>
+    </div>
+</div>
+
+<!-- Search Section -->
+<div class="search-section">
+    <h6><i class="bi bi-search me-2"></i>Quick Search</h6>
+    <div class="row">
+        <div class="col-md-6">
+            <input type="text" class="form-control" id="searchInput" placeholder="Search by name or prisoner ID...">
+        </div>
+        <div class="col-md-6">
+            <button class="btn btn-outline-primary w-100" onclick="performSearch()">
+                <i class="bi bi-search me-2"></i>Search Records
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Records Table -->
+<div class="card records-card">
+    <div class="card-body">
+        {% if prisoners %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle table-loading">
+                <thead>
+                    <tr>
+                        <th><i class="bi bi-hash me-2"></i>Prisoner ID</th>
+                        <th><i class="bi bi-person me-2"></i>Full Name</th>
+                        <th><i class="bi bi-calendar me-2"></i>Date of Birth</th>
+                        <th class="text-end"><i class="bi bi-gear me-2"></i>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prisoner in prisoners %}
+                    <tr data-prisoner-id="{{ prisoner.prisoner_id }}">
+                        <td>
+                            <div class="prisoner-id">
+                                {{ prisoner.prisoner_id }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="prisoner-name">
+                                {{ prisoner.first_name }} {{ prisoner.last_name }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="dob-info">
+                                <i class="bi bi-calendar3 me-2"></i>{{ prisoner.date_of_birth|date:"M d, Y" }}
+                                {% if prisoner.date_of_birth %}
+                                    <small class="d-block mt-1" style="color: var(--text-gray);">
+                                        <!-- FIXED: Correct Age Calculation -->
+                                        Age: <span class="age-display" data-birth-date="{{ prisoner.date_of_birth|date:'Y-m-d' }}">
+                                            Calculating...
+                                        </span>
+                                    </small>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'prisoner_detail' prisoner.pk %}" class="btn btn-view-details">
+                                <i class="bi bi-eye-fill"></i>View Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-people"></i>
+            <h4>No Prisoner Records Found</h4>
+            <p>There are no prisoners registered for this facility yet. Click the button below to add the first prisoner record.</p>
+            <a href="{% url 'prisoner_create' %}" class="btn btn-add-prisoner">
+                <i class="bi bi-person-plus-fill me-2"></i>Add First Prisoner
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ✅ FIXED: Correct Age Calculation Function
+    function calculateAge(birthDate) {
+        const today = new Date();
+        const birth = new Date(birthDate);
+        
+        if (birth > today) {
+            return 0; // Future date
+        }
+        
+        let age = today.getFullYear() - birth.getFullYear();
+        const monthDiff = today.getMonth() - birth.getMonth();
+        
+        // If birthday hasn't occurred this year, subtract 1
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+            age--;
+        }
+        
+        return age;
+    }
+    
+    // Calculate and display ages correctly
+    const ageDisplays = document.querySelectorAll('.age-display');
+    ageDisplays.forEach(ageDisplay => {
+        const birthDate = ageDisplay.getAttribute('data-birth-date');
+        if (birthDate) {
+            const age = calculateAge(birthDate);
+            ageDisplay.textContent = `${age} years`;
+        } else {
+            ageDisplay.textContent = 'Unknown';
+        }
+    });
+    
+    // Force name and ID visibility on page load
+    const prisonerNames = document.querySelectorAll('.prisoner-name');
+    const prisonerIds = document.querySelectorAll('.prisoner-id');
+    
+    prisonerNames.forEach(name => {
+        name.style.color = '#000000';
+        name.style.background = '#ffffff';
+        name.style.fontWeight = '800';
+        name.style.fontSize = '1.1rem';
+        name.style.padding = '0.5rem 1rem';
+        name.style.borderRadius = '6px';
+        name.style.display = 'inline-block';
+        name.style.border = '1px solid #555';
+        name.style.minWidth = '200px';
+        name.style.textAlign = 'center';
+    });
+    
+    prisonerIds.forEach(id => {
+        id.style.color = '#000000';
+        id.style.background = '#ffffff';
+        id.style.fontWeight = '800';
+        id.style.fontSize = '1rem';
+        id.style.padding = '0.4rem 0.8rem';
+        id.style.borderRadius = '6px';
+        id.style.display = 'inline-block';
+        id.style.border = '1px solid #555';
+        id.style.fontFamily = 'Courier New, monospace';
+        id.style.letterSpacing = '1px';
+    });
+
+    // Add loading animation to table
+    const table = document.querySelector('.table-loading');
+    if (table) {
+        setTimeout(() => {
+            table.style.opacity = '1';
+        }, 100);
+    }
+
+    // Enhanced row hover effects
+    const tableRows = document.querySelectorAll('tbody tr[data-prisoner-id]');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.borderLeft = '4px solid var(--info)';
+            this.style.paddingLeft = '12px';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.borderLeft = 'none';
+            this.style.paddingLeft = '16px';
+        });
+    });
+
+    // View details button animation
+    const viewButtons = document.querySelectorAll('.btn-view-details');
+    viewButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            this.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Loading...';
+            this.disabled = true;
+        });
+    });
+
+    // Animate statistics numbers
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(stat => {
+        const finalValue = parseInt(stat.textContent);
+        if (!isNaN(finalValue) && finalValue > 0) {
+            stat.textContent = '0';
+            let current = 0;
+            const increment = Math.max(1, Math.ceil(finalValue / 20));
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= finalValue) {
+                    current = finalValue;
+                    clearInterval(timer);
+                }
+                stat.textContent = current;
+            }, 80);
+        }
+    });
+});
+
+// Search functionality
+function performSearch() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('tbody tr[data-prisoner-id]');
+    
+    rows.forEach(row => {
+        const name = row.querySelector('.prisoner-name').textContent.toLowerCase();
+        const id = row.querySelector('.prisoner-id').textContent.toLowerCase();
+        
+        if (name.includes(searchTerm) || id.includes(searchTerm) || searchTerm === '') {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Search on Enter key
+document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && document.activeElement.id === 'searchInput') {
+        performSearch();
+    }
+});
+</script>
+{% endblock %}

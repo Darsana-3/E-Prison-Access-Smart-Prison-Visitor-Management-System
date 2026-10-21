@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Dashboard{% endblock %} | E-Prison Access System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Dark Prison Theme Colors */
+            --primary-dark: #0f1419;
+            --secondary-dark: #1a1f26;
+            --accent-dark: #252d38;
+            --border-dark: #2d3748;
+            --text-primary: #e2e8f0;
+            --text-secondary: #a0aec0;
+            --text-muted: #718096;
+            
+            /* Security Colors */
+            --security-red: #dc3545;
+            --security-orange: #fd7e14;
+            --security-green: #28a745;
+            --security-blue: #007bff;
+            --warning-yellow: #ffc107;
+            
+            /* Layout */
+            --sidebar-width: 280px;
+            --header-height: 70px;
+            --emergency-height: 70px;
+            --border-radius: 8px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Shadows */
+            --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.3);
+            --shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.4);
+            --shadow-heavy: 0 8px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--primary-dark);
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Emergency Alert Top Banner */
+        .emergency-alert-top-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 2000;
+            background: linear-gradient(90deg, var(--security-red) 0%, #ff0000 50%, var(--security-red) 100%);
+            color: white;
+            padding: 12px 0;
+            font-weight: 700;
+            animation: emergency-flash 2s infinite;
+            border-bottom: 3px solid #fff;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.8);
+            height: var(--emergency-height);
+            display: flex;
+            align-items: center;
+        }
+
+        @keyframes emergency-flash {
+            0%, 100% { 
+                background: linear-gradient(90deg, var(--security-red) 0%, #ff0000 50%, var(--security-red) 100%);
+                opacity: 1; 
+            }
+            50% { 
+                background: linear-gradient(90deg, #ff0000 0%, var(--security-red) 50%, #ff0000 100%);
+                opacity: 0.9; 
+            }
+        }
+
+        .alert-message-top {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-top: 3px;
+            line-height: 1.3;
+            max-width: 60%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .alert-controls {
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+            gap: 15px;
+        }
+
+        .alert-info-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.8rem;
+        }
+
+        /* Adjust body padding when emergency alert is active */
+        body.emergency-alert-active {
+            padding-top: var(--emergency-height) !important;
+        }
+
+        body.emergency-alert-active #sidebar {
+            top: var(--emergency-height);
+            height: calc(100vh - var(--emergency-height));
+        }
+
+        body.emergency-alert-active .top-navbar {
+            margin-top: 0;
+        }
+
+        body.emergency-alert-active .floating-toggle {
+            top: calc(var(--emergency-height) + 20px);
+        }
+
+        /* Enhanced Page Loader with Prison Theme */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .page-loader.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader-content {
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .loader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border-dark);
+            border-top: 4px solid var(--security-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        .loader-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Prison-Themed Sidebar */
+        #sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--secondary-dark) 0%, var(--accent-dark) 100%);
+            color: var(--text-primary);
+            transition: var(--transition);
+            transform: translateX(0);
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            border-right: 2px solid var(--border-dark);
+            box-shadow: var(--shadow-heavy);
+            top: 0;
+        }
+
+        #sidebar.active {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+            border-bottom: 2px solid var(--border-dark);
+            text-align: center;
+            position: relative;
+        }
+
+        .sidebar-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--security-red) 0%, var(--security-orange) 50%, var(--security-red) 100%);
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .sidebar-header .facility-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid var(--security-red);
+            border-radius: var(--border-radius);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #ff6b7a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        /* Enhanced User Badge with Family Info */
+        .user-info-badge {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: rgba(0, 123, 255, 0.1);
+            border: 1px solid var(--security-blue);
+            border-radius: var(--border-radius);
+            font-size: 0.7rem;
+            color: var(--security-blue);
+        }
+
+        .family-indicator {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--security-green);
+            border-radius: 50%;
+            margin-right: 4px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .prison-image {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200"><rect width="400" height="200" fill="%23252d38"/><rect x="50" y="30" width="300" height="140" fill="none" stroke="%234a5568" stroke-width="3"/><rect x="70" y="50" width="60" height="100" fill="none" stroke="%234a5568" stroke-width="2"/><rect x="140" y="50" width="60" height="100" fill="none" stroke="%234a5568" stroke-width="2"/><rect x="210" y="50" width="60" height="100" fill="none" stroke="%234a5568" stroke-width="2"/><rect x="280" y="50" width="60" height="100" fill="none" stroke="%234a5568" stroke-width="2"/><circle cx="200" cy="20" r="8" fill="%23ffc107"/><text x="200" y="190" text-anchor="middle" fill="%23a0aec0" font-family="Arial" font-size="12">DISTRICT JAIL TRIVANDRUM</text></svg>') center/cover;
+            margin: 15px 0;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-dark);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prison-image::after {
+            content: 'DISTRICT JAIL TRIVANDRUM';
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .sidebar-nav {
+            padding: 15px 0;
+            height: calc(100vh - 220px);
+            overflow-y: auto;
+        }
+
+        .sidebar-nav::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: var(--accent-dark);
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: var(--border-dark);
+            border-radius: 2px;
+        }
+
+        .nav-item {
+            position: relative;
+            margin: 2px 12px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            position: relative;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+            border-left-color: var(--security-blue);
+            transform: translateX(3px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, rgba(0, 123, 255, 0.2) 0%, rgba(0, 123, 255, 0.1) 100%);
+            color: var(--text-primary);
+            border-left-color: var(--security-blue);
+            box-shadow: var(--shadow-light);
+        }
+
+        .nav-link i {
+            font-size: 1.1rem;
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Security Status Indicators */
+        .nav-link[href*="security"] i::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--security-green);
+            border-radius: 50%;
+            top: -2px;
+            right: -2px;
+            box-shadow: 0 0 4px var(--security-green);
+        }
+
+        /* Family Navigation Indicators */
+        .nav-link[href*="family"] i::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--warning-yellow);
+            border-radius: 50%;
+            top: -2px;
+            right: -2px;
+            box-shadow: 0 0 4px var(--warning-yellow);
+        }
+
+        /* Main Content Area */
+        #content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            background: var(--primary-dark);
+            min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        #content.sidebar-collapsed {
+            margin-left: 0;
+        }
+
+        /* Enhanced Top Navigation */
+        .top-navbar {
+            background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--accent-dark) 100%);
+            border-bottom: 2px solid var(--border-dark);
+            padding: 0 30px;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow-medium);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+        }
+
+        .security-indicator {
+            display: flex;
+            align-items: center;
+            background: rgba(40, 167, 69, 0.2);
+            color: var(--security-green);
+            padding: 6px 12px;
+            border-radius: var(--border-radius);
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .security-indicator i {
+            margin-right: 6px;
+            animation: pulse 2s infinite;
+        }
+
+        /* Enhanced User Dropdown */
+        .user-dropdown .dropdown-toggle {
+            background: var(--accent-dark);
+            border: 1px solid var(--border-dark);
+            border-radius: var(--border-radius);
+            padding: 10px 16px;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-dropdown .dropdown-toggle:hover {
+            background: var(--border-dark);
+            border-color: var(--security-blue);
+            box-shadow: var(--shadow-light);
+        }
+
+        .user-info-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .dropdown-menu {
+            background: var(--secondary-dark);
+            border: 1px solid var(--border-dark);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-heavy);
+            margin-top: 8px;
+            min-width: 220px;
+        }
+
+        .dropdown-item {
+            color: var(--text-secondary);
+            padding: 12px 16px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(0, 123, 255, 0.1);
+            color: var(--security-blue);
+        }
+
+        .dropdown-item.text-danger:hover {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--security-red);
+        }
+
+        /* Enhanced Alert System */
+        .alert {
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 16px 20px;
+            margin: 20px 30px;
+            border-left: 4px solid;
+            position: relative;
+            animation: alertSlide 0.5s ease-out;
+        }
+
+        @keyframes alertSlide {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--security-green);
+            border-left-color: var(--security-green);
+        }
+
+        .alert-danger {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--security-red);
+            border-left-color: var(--security-red);
+        }
+
+        .alert-warning {
+            background: rgba(255, 193, 7, 0.1);
+            color: var(--warning-yellow);
+            border-left-color: var(--warning-yellow);
+        }
+
+        .alert-info {
+            background: rgba(0, 123, 255, 0.1);
+            color: var(--security-blue);
+            border-left-color: var(--security-blue);
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 30px;
+            animation: contentFade 0.6s ease-out;
+        }
+
+        @keyframes contentFade {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Emergency Features */
+        .emergency-banner {
+            background: linear-gradient(135deg, var(--security-red) 0%, #a71e1e 100%);
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
+            animation: emergencyPulse 1s infinite alternate;
+        }
+
+        @keyframes emergencyPulse {
+            from { opacity: 0.8; }
+            to { opacity: 1; }
+        }
+
+        /* Mobile Floating Toggle */
+        .floating-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: var(--security-blue);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            box-shadow: var(--shadow-heavy);
+            transition: var(--transition);
+            display: none;
+        }
+
+        .floating-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+            
+            #sidebar.active {
+                transform: translateX(0);
+            }
+            
+            #content {
+                margin-left: 0;
+            }
+            
+            .floating-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .top-navbar {
+                padding: 0 20px;
+            }
+            
+            .content-area {
+                padding: 20px;
+            }
+
+            .prison-image {
+                height: 80px;
+            }
+
+            .emergency-alert-top-banner {
+                padding: 8px 0;
+                font-size: 0.9rem;
+                height: 60px;
+            }
+            
+            .alert-message-top {
+                font-size: 0.8rem;
+                max-width: 50%;
+            }
+            
+            .alert-controls {
+                font-size: 0.75rem;
+                gap: 10px;
+            }
+            
+            body.emergency-alert-active {
+                padding-top: 60px !important;
+            }
+            
+            body.emergency-alert-active #sidebar {
+                top: 60px;
+                height: calc(100vh - 60px);
+            }
+            
+            body.emergency-alert-active .floating-toggle {
+                top: 80px;
+            }
+
+            .user-info-text {
+                display: none;
+            }
+        }
+
+        /* Enhanced Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--primary-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-dark);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Homepage Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--accent-dark) 100%);
+            padding: 60px 30px;
+            text-align: center;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            border: 1px solid var(--border-dark);
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .security-badges {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .security-badge {
+            background: rgba(0, 123, 255, 0.1);
+            border: 1px solid var(--security-blue);
+            color: var(--security-blue);
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--secondary-dark);
+            border: 1px solid var(--border-dark);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .card-header {
+            background: var(--accent-dark);
+            border-bottom: 1px solid var(--border-dark);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .card-body {
+            color: var(--text-secondary);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--security-blue);
+            border-color: var(--security-blue);
+        }
+
+        .btn-danger {
+            background: var(--security-red);
+            border-color: var(--security-red);
+        }
+
+        .btn-success {
+            background: var(--security-green);
+            border-color: var(--security-green);
+        }
+
+        .btn-outline-primary {
+            color: var(--security-blue);
+            border-color: var(--security-blue);
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--security-blue);
+            border-color: var(--security-blue);
+        }
+
+        /* Forms */
+        .form-control {
+            background: var(--accent-dark);
+            border: 1px solid var(--border-dark);
+            color: var(--text-primary);
+        }
+
+        .form-control:focus {
+            background: var(--accent-dark);
+            border-color: var(--security-blue);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .form-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        {% block extra_head %}{% endblock %}
+    </style>
+</head>
+<body {% if active_alert %}class="emergency-alert-active"{% endif %}>
+    <!-- Emergency Alert Banner - Shows at the very top when active -->
+    {% if active_alert %}
+    <div class="emergency-alert-top-banner">
+        <div class="container-fluid">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
+                    <div>
+                        <div><strong>🚨 FACILITY EMERGENCY ALERT ACTIVE 🚨</strong></div>
+                        <div class="alert-message-top">{{ active_alert.message }}</div>
+                    </div>
+                </div>
+                <div class="alert-controls">
+                    <div class="alert-info-text">
+                        <i class="bi bi-person me-1"></i>{{ active_alert.issued_by.get_full_name|default:active_alert.issued_by.username }}
+                        <span class="ms-2"><i class="bi bi-clock me-1"></i>{{ active_alert.issued_at|date:"H:i" }}</span>
+                    </div>
+                    {% if user.is_staff %}
+                        <a href="{% url 'deactivate_alert' active_alert.pk %}" 
+                           class="btn btn-sm btn-outline-light"
+                           onclick="return confirm('Deactivate this emergency alert? This will remove it from all screens.')">
+                            <i class="bi bi-x-circle me-1"></i>Deactivate
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Page Loader -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">
+                <div>LOADING E-PRISON ACCESS</div>
+                <div style="font-size: 0.8rem; margin-top: 5px; color: var(--text-secondary);">SECURE SYSTEM INITIALIZATION</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="wrapper">
+        <!-- Floating Toggle Button for Mobile -->
+        <button type="button" class="floating-toggle" id="floatingToggle">
+            <i class="bi bi-list"></i>
+        </button>
+
+        {% if user.is_authenticated %}
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="bi bi-shield-lock-fill"></i> E-PRISON ACCESS</h3>
+                <div class="prison-image"></div>
+                <span class="facility-badge">{{ user.get_role_display }}</span>
+                
+                <!-- Enhanced User Info with Family Status and Prisoner Relationship -->
+                {% if user.role == 'family' %}
+                <div class="user-info-badge">
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <span class="family-indicator"></span>
+                        FAMILY MEMBER
+                    </div>
+                    {% if user.can_authorize_emergency_visits %}
+                        <div style="font-size: 0.6rem; margin-top: 2px; color: var(--warning-yellow);">
+                            EMERGENCY AUTHORIZER
+                        </div>
+                    {% elif user.primary_family_member %}
+                        <div style="font-size: 0.6rem; margin-top: 2px;">
+                            LINKED TO {{ user.primary_family_member.full_name|truncatechars:15 }}
+                        </div>
+                    {% endif %}
+                    {% if user.related_prisoner %}
+                        <div style="font-size: 0.6rem; margin-top: 2px; color: var(--text-muted);">
+                            VISITING: {{ user.related_prisoner.full_name|truncatechars:15 }}
+                        </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="sidebar-nav">
+                <div class="nav-item">
+                    <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                        <i class="bi bi-speedometer2"></i>
+                        DASHBOARD
+                    </a>
+                </div>
+
+                {% if user.role == 'admin' %}
+                    <div class="nav-item">
+                        <a href="{% url 'review_visits' %}" class="nav-link {% if request.resolver_match.url_name == 'review_visits' %}active{% endif %}">
+                            <i class="bi bi-clipboard-check-fill"></i>
+                            REVIEW REQUESTS
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{% url 'prisoner_list' %}" class="nav-link {% if request.resolver_match.url_name == 'prisoner_list' %}active{% endif %}">
+                            <i class="bi bi-person-fill-lock"></i>
+                            PRISONER RECORDS
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{% url 'jail_list' %}" class="nav-link {% if request.resolver_match.url_name == 'jail_list' %}active{% endif %}">
+                            <i class="bi bi-building-gear"></i>
+                            MANAGE FACILITIES
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{% url 'manage_security_staff' %}" class="nav-link {% if request.resolver_match.url_name == 'manage_security_staff' %}active{% endif %}">
+                            <i class="bi bi-people-fill"></i>
+                            SECURITY STAFF
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{% url 'blacklist_list' %}" class="nav-link {% if request.resolver_match.url_name == 'blacklist_list' %}active{% endif %}">
+                            <i class="bi bi-person-x-fill"></i>
+                            BLACKLIST MGMT
+                        </a>
+                    </div>
+                
+                {% elif user.role == 'security' %}
+                    <div class="nav-item">
+                        <a href="{% url 'security_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'security_dashboard' %}active{% endif %}">
+                            <i class="bi bi-shield-check"></i>
+                            SECURITY CONTROL
+                        </a>
+                    </div>
+
+                {% else %}
+                    <!-- Visitor/Family Navigation -->
+                    <div class="nav-item">
+                        <a href="{% url 'request_visit' %}" class="nav-link {% if request.resolver_match.url_name == 'request_visit' %}active{% endif %}">
+                            <i class="bi bi-calendar-plus"></i>
+                            REQUEST VISIT
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{% url 'my_visits' %}" class="nav-link {% if request.resolver_match.url_name == 'my_visits' %}active{% endif %}">
+                            <i class="bi bi-journal-text"></i>
+                            MY VISITS
+                        </a>
+                    </div>
+                    
+                    <!-- Profile Management -->
+                    <div class="nav-item">
+                        <a href="{% url 'user_profile' %}" class="nav-link {% if request.resolver_match.url_name == 'user_profile' %}active{% endif %}">
+                            <i class="bi bi-person-circle"></i>
+                            MY PROFILE
+                        </a>
+                    </div>
+                    
+                    <!-- Prisoner Information for Family Members -->
+                    {% if user.role == 'family' and user.related_prisoner %}
+                    <div class="nav-item">
+                        <a href="{% url 'prisoner_detail' user.related_prisoner.pk %}" class="nav-link">
+                            <i class="bi bi-person-badge"></i>
+                            PRISONER INFO
+                        </a>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </nav>
+        {% endif %}
+
+        <div id="content">
+            <nav class="top-navbar">
+                <div class="d-flex justify-content-between align-items-center w-100">
+                    <div class="d-flex align-items-center">
+                        <button type="button" id="sidebarCollapse" class="btn btn-outline-primary d-none d-md-block me-3">
+                            <i class="bi bi-list"></i>
+                        </button>
+                        <span class="navbar-brand mb-0">{% block page_title %}E-PRISON DASHBOARD{% endblock %}</span>
+                    </div>
+                    
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="security-indicator">
+                            <i class="bi bi-shield-check"></i>
+                            SECURE CONNECTION
+                        </div>
+                        
+                        {% if user.is_authenticated %}
+                            <div class="user-dropdown">
+                                <button class="btn dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-badge"></i>
+                                    <div class="user-info-text">
+                                        <div class="user-name">{{ user.full_name|default:user.username|truncatechars:20 }}</div>
+                                        <div class="user-role">
+                                            {{ user.get_role_display }}
+                                            {% if user.role == 'family' and user.can_authorize_emergency_visits %} • AUTHORIZER{% endif %}
+                                        </div>
+                                    </div>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'user_profile' %}">
+                                            <i class="bi bi-person"></i>
+                                            My Profile
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'edit_profile' %}">
+                                            <i class="bi bi-pencil"></i>
+                                            Edit Profile
+                                        </a>
+                                    </li>
+                                    {% if user.role == 'family' %}
+                                    <li class="dropdown-item-text" style="font-size: 0.8rem; color: var(--text-muted);">
+                                        {% if user.related_prisoner %}
+                                            Related to: {{ user.related_prisoner.full_name }}
+                                        {% endif %}
+                                        {% if user.primary_family_member %}
+                                            <br>Authorized by: {{ user.primary_family_member.full_name }}
+                                        {% endif %}
+                                    </li>
+                                    {% endif %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="{% url 'user_logout' %}">
+                                            <i class="bi bi-power"></i>
+                                            SECURE LOGOUT
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        {% else %}
+                            <div class="d-flex gap-2">
+                                <a class="btn btn-outline-primary" href="{% url 'visitor_login' %}">VISITOR ACCESS</a>
+                                <a class="btn btn-primary" href="{% url 'staff_login' %}">STAFF ACCESS</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </nav>
+
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'danger' %}exclamation-triangle{% elif message.tags == 'warning' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="content-area">
+                {% block content %}
+                <!-- Default Homepage Content -->
+                <div class="hero-section">
+                    <h1 class="hero-title">
+                        <i class="bi bi-building-lock me-3"></i>
+                        E-PRISON ACCESS SYSTEM
+                    </h1>
+                    <p class="hero-subtitle">
+                        Secure Digital Prison Management & Visitor Control System<br>
+                        District Jail Trivandrum - Government of Kerala
+                    </p>
+                    <div class="security-badges">
+                        <span class="security-badge">
+                            <i class="bi bi-shield-check me-2"></i>
+                            SECURE ACCESS
+                        </span>
+                        <span class="security-badge">
+                            <i class="bi bi-qr-code-scan me-2"></i>
+                            QR VERIFICATION
+                        </span>
+                        <span class="security-badge">
+                            <i class="bi bi-clock me-2"></i>
+                            REAL-TIME MONITORING
+                        </span>
+                        {% if user.role == 'family' %}
+                        <span class="security-badge" style="background: rgba(255, 193, 7, 0.1); border-color: var(--warning-yellow); color: var(--warning-yellow);">
+                            <i class="bi bi-people me-2"></i>
+                            FAMILY MEMBER ACCESS
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Enhanced page loader with prison theme
+            const pageLoader = document.getElementById('pageLoader');
+            setTimeout(() => {
+                pageLoader.classList.add('fade-out');
+                setTimeout(() => {
+                    pageLoader.style.display = 'none';
+                }, 500);
+            }, 1200);
+
+            // Sidebar functionality
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            const sidebarCollapse = document.getElementById('sidebarCollapse');
+            const floatingToggle = document.getElementById('floatingToggle');
+
+            function toggleSidebar() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('active');
+                } else {
+                    sidebar.classList.toggle('active');
+                    content.classList.toggle('sidebar-collapsed');
+                }
+            }
+
+            // Event listeners
+            sidebarCollapse?.addEventListener('click', toggleSidebar);
+            floatingToggle?.addEventListener('click', toggleSidebar);
+
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 768) {
+                    const isClickInsideSidebar = sidebar?.contains(event.target);
+                    const isClickOnToggle = floatingToggle?.contains(event.target) || sidebarCollapse?.contains(event.target);
+                    
+                    if (!isClickInsideSidebar && !isClickOnToggle && !sidebar?.classList.contains('active')) {
+                        sidebar?.classList.add('active');
+                    }
+                }
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768 && sidebar) {
+                    sidebar.classList.remove('active');
+                    content.classList.remove('sidebar-collapsed');
+                }
+            });
+
+            // Auto-dismiss alerts after 6 seconds
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 6000);
+            });
+
+            // Security indicator animation
+            const securityIndicator = document.querySelector('.security-indicator');
+            if (securityIndicator) {
+                setInterval(() => {
+                    securityIndicator.style.opacity = '0.7';
+                    setTimeout(() => {
+                        securityIndicator.style.opacity = '1';
+                    }, 200);
+                }, 3000);
+            }
+
+            // Emergency Alert Auto-refresh (check every 30 seconds)
+            setInterval(function() {
+                if (document.querySelector('.emergency-alert-top-banner')) {
+                    // Alert is currently showing, check if it's still active
+                    fetch('{% url "check_alert_api" %}', {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.active) {
+                            location.reload();
+                        }
+                    })
+                    .catch(error => console.log('Alert check failed:', error));
+                } else {
+                    // No alert showing, check for new alerts
+                    fetch('{% url "check_alert_api" %}', {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.active) {
+                            location.reload();
+                        }
+                    })
+                    .catch(error => console.log('Alert check failed:', error));
+                }
+            }, 30000);
+
+            // Console security warning
+            console.log(
+                '%cSECURITY WARNING', 
+                'color: #dc3545; font-size: 20px; font-weight: bold;'
+            );
+            console.log(
+                '%cThis is a secure prison management system. Unauthorized access is prohibited and monitored.',
+                'color: #6c757d; font-size: 14px;'
+            );
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

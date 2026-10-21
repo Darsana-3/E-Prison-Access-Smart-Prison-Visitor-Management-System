@@ -1,0 +1,1128 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Request a Visit{% endblock %}
+{% block page_title %}REQUEST PRISON VISIT{% endblock %}
+
+{% block extra_head %}
+<style>
+/* Search Container */
+.search-container {
+    background: var(--secondary-dark);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-medium);
+}
+
+.search-header {
+    margin-bottom: 2rem;
+}
+
+.search-header h3 {
+    color: var(--text-primary);
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.search-header p {
+    color: var(--text-secondary);
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* Form Elements */
+.form-label {
+    color: var(--text-primary) !important;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-label i {
+    color: var(--security-blue);
+}
+
+/* Card Grid Layout */
+.prisoners-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* ID Card Style */
+.prisoner-card {
+    background: linear-gradient(135deg, #1a1d29 0%, #252936 100%);
+    border: 3px solid var(--border-dark);
+    border-radius: 12px;
+    padding: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    position: relative;
+}
+
+.prisoner-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--security-blue), var(--security-green));
+}
+
+.prisoner-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--security-blue);
+    box-shadow: 0 12px 32px rgba(0, 123, 255, 0.4);
+}
+
+/* Family Member Card Highlight */
+.prisoner-card.family-member {
+    border-color: var(--security-green);
+    background: linear-gradient(135deg, #1a2d19 0%, #253625 100%);
+}
+
+.prisoner-card.family-member::before {
+    background: linear-gradient(90deg, var(--security-green), #20c997);
+}
+
+.prisoner-card.family-member:hover {
+    border-color: var(--security-green);
+    box-shadow: 0 12px 32px rgba(40, 167, 69, 0.4);
+}
+
+/* ID Card Header */
+.id-card-header {
+    background: linear-gradient(135deg, rgba(0, 123, 255, 0.15), rgba(40, 167, 69, 0.15));
+    padding: 1.25rem;
+    border-bottom: 2px solid var(--border-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.id-card-header.family-member {
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.15), rgba(32, 201, 151, 0.15));
+}
+
+.id-card-header i {
+    color: var(--security-blue);
+    font-size: 1.1rem;
+}
+
+.id-card-header.family-member i {
+    color: var(--security-green);
+}
+
+.id-card-header h6 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ID Card Body - Main Info Section */
+.id-card-body {
+    padding: 2rem;
+    display: flex;
+    gap: 1.5rem;
+    background: var(--secondary-dark);
+}
+
+/* Photo Section */
+.id-photo-section {
+    flex-shrink: 0;
+}
+
+.id-photo-frame {
+    position: relative;
+    padding: 4px;
+    background: linear-gradient(135deg, var(--security-blue), var(--security-green));
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.id-photo-frame.family-member {
+    background: linear-gradient(135deg, var(--security-green), #20c997);
+}
+
+.prisoner-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    border: 3px solid var(--secondary-dark);
+}
+
+.prisoner-photo-placeholder {
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--security-blue), var(--security-green));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    border: 3px solid var(--secondary-dark);
+}
+
+.prisoner-photo-placeholder.family-member {
+    background: linear-gradient(135deg, var(--security-green), #20c997);
+}
+
+/* ID Details Section */
+.id-details-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.prisoner-name-block {
+    border-bottom: 2px solid var(--border-dark);
+    padding-bottom: 1rem;
+}
+
+.prisoner-name {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+}
+
+.prisoner-id-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0, 123, 255, 0.15);
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 123, 255, 0.3);
+}
+
+.prisoner-id-badge i {
+    color: var(--security-blue);
+    font-size: 0.9rem;
+}
+
+.prisoner-id-badge span {
+    color: var(--text-primary);
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+/* Info Grid */
+.id-info-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+.id-info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--accent-dark);
+    border-radius: 8px;
+    border: 1px solid var(--border-dark);
+}
+
+.id-info-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: rgba(0, 123, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.id-info-icon i {
+    color: var(--security-blue);
+    font-size: 0.95rem;
+}
+
+.id-info-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.id-info-label {
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.id-info-value {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.95rem;
+    font-family: 'Roboto Mono', monospace;
+}
+
+/* Visit Request Section */
+.visit-request-section {
+    padding: 1.5rem 2rem 2rem 2rem;
+    background: var(--accent-dark);
+    border-top: 2px solid var(--border-dark);
+}
+
+.visit-request-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.visit-request-header i {
+    color: var(--security-green);
+    font-size: 1.1rem;
+}
+
+.visit-request-header h6 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.visit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.form-group label i {
+    color: var(--security-blue);
+    font-size: 0.8rem;
+}
+
+.form-group input,
+.form-group select {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    background: var(--secondary-dark);
+    border: 2px solid var(--border-dark);
+    color: var(--text-primary);
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--security-blue);
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.15);
+    outline: none;
+    background: var(--secondary-dark);
+}
+
+.visit-actions {
+    display: grid;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.visit-actions.has-emergency {
+    grid-template-columns: 1fr 1fr;
+}
+
+.visit-actions.no-emergency {
+    grid-template-columns: 1fr;
+}
+
+.visit-actions .btn {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    border: 2px solid transparent;
+}
+
+.visit-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.visit-actions .btn i {
+    font-size: 1rem;
+}
+
+.visit-actions .btn-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border-color: #28a745;
+}
+
+.visit-actions .btn-success:hover {
+    background: linear-gradient(135deg, #218838, #1aa179);
+    border-color: #1e7e34;
+}
+
+.visit-actions .btn-warning {
+    background: linear-gradient(135deg, #ffc107, #ff9800);
+    border-color: #ffc107;
+    color: #000;
+}
+
+.visit-actions .btn-warning:hover {
+    background: linear-gradient(135deg, #e0a800, #e68900);
+    border-color: #d39e00;
+}
+
+.btn-emergency {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-emergency::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-emergency:hover::before {
+    left: 100%;
+}
+
+/* Emergency Info Box */
+.emergency-info-box {
+    background: rgba(255, 193, 7, 0.1);
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    color: #ffc107;
+    display: none;
+}
+
+.emergency-info-box h6 {
+    color: #ffc107;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.emergency-info-box ul {
+    margin: 0.5rem 0 0 0;
+    padding-left: 1.5rem;
+    color: #ffcc66;
+    font-size: 0.8rem;
+}
+
+.emergency-info-box li {
+    margin-bottom: 0.25rem;
+}
+
+/* Emergency Locked Message */
+.emergency-locked-message {
+    background: rgba(220, 53, 69, 0.15);
+    border: 2px solid #dc3545;
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin: 1rem 0;
+    color: #ff6b6b;
+    text-align: center;
+}
+
+.emergency-locked-message i.lock-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.emergency-locked-message h6 {
+    color: #ff6b6b;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.emergency-locked-message p {
+    color: #ffaaaa;
+    margin: 0.5rem 0;
+    font-size: 0.85rem;
+}
+
+/* Last Emergency Visit Info */
+.last-emergency-info {
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid #ffc107;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+}
+
+.last-emergency-info p {
+    margin: 0;
+    color: #ffcc66;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.last-emergency-info strong {
+    color: #ffc107;
+}
+
+/* Countdown Timer */
+.countdown-timer {
+    background: rgba(255, 193, 7, 0.15);
+    border: 2px solid #ffc107;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-top: 0.75rem;
+    font-weight: 700;
+    color: #ffc107;
+    font-size: 0.9rem;
+}
+
+.countdown-timer small {
+    display: block;
+    margin-top: 0.5rem;
+    opacity: 0.85;
+    font-size: 0.8rem;
+}
+
+/* Results Header */
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.results-header h4 {
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.results-count {
+    color: var(--text-primary);
+    background: var(--accent-dark);
+    padding: 0.625rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    border: 2px solid var(--border-dark);
+    font-weight: 700;
+    font-family: 'Roboto Mono', monospace;
+}
+
+/* Info States */
+.info-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--secondary-dark);
+    border: 2px solid var(--border-dark);
+    border-radius: var(--border-radius);
+    margin: 2rem 0;
+    box-shadow: var(--shadow-medium);
+}
+
+.info-state i {
+    color: var(--text-muted);
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.6;
+}
+
+.info-state h4 {
+    color: var(--text-primary);
+    margin: 1rem 0;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.info-state p {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    font-size: 1rem;
+}
+
+/* Loading */
+.loading-spinner {
+    display: none;
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+    background: var(--secondary-dark);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--border-radius);
+    margin-bottom: 1.5rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .prisoners-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .id-card-body {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .id-photo-section {
+        margin-bottom: 1rem;
+    }
+    
+    .prisoner-name-block {
+        text-align: center;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .visit-actions {
+        grid-template-columns: 1fr;
+    }
+    
+    .visit-actions.has-emergency {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-container {
+        padding: 1.5rem;
+    }
+    
+    .id-card-body,
+    .visit-request-section {
+        padding: 1.25rem;
+    }
+    
+    .prisoner-name {
+        font-size: 1.25rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Search Section -->
+    <div class="search-container">
+        <div class="search-header">
+            <h3>
+                <i class="bi bi-search"></i>
+                FIND PRISONER
+            </h3>
+            <p>Search for the prisoner you want to visit by selecting facility and entering their name.</p>
+        </div>
+        
+        <form id="search-form" method="get">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-lg-5">
+                    <label for="jail" class="form-label">
+                        <i class="bi bi-building"></i>
+                        SELECT FACILITY
+                    </label>
+                    <select name="jail" id="jail" class="form-select" required>
+                        <option value="">-- Choose Facility --</option>
+                        {% for jail in jails %}
+                        <option value="{{ jail.id }}" {% if jail.id|stringformat:"s" == selected_jail %}selected{% endif %}>
+                            {{ jail.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-lg-4">
+                    <label for="prisoner_name" class="form-label">
+                        <i class="bi bi-person"></i>
+                        PRISONER NAME
+                    </label>
+                    <input type="text" name="prisoner_name" id="prisoner_name" 
+                           class="form-control" value="{{ search_query|default:'' }}" 
+                           placeholder="Enter first name" required>
+                </div>
+                <div class="col-lg-3">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100" id="search-btn">
+                        <i class="bi bi-search me-2"></i>SEARCH
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-spinner" id="loading-spinner">
+        <p>Searching for prisoners...</p>
+    </div>
+
+    <!-- Results -->
+    <div class="results-container">
+        {% if search_query and selected_jail %}
+            <div class="results-header">
+                <h4>
+                    <i class="bi bi-person-check-fill"></i>
+                    SEARCH RESULTS
+                </h4>
+                <div class="results-count">
+                    FOUND: {{ prisoners|length }} PRISONER{{ prisoners|length|pluralize }}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if prisoners %}
+            <div class="prisoners-grid">
+                {% for prisoner in prisoners %}
+                {% if user.related_prisoner and user.related_prisoner.id == prisoner.id %}
+                    <div class="prisoner-card family-member">
+                        <div class="id-card-header family-member">
+                            <i class="bi bi-people-fill"></i>
+                            <h6>FAMILY MEMBER IDENTIFICATION</h6>
+                        </div>
+                {% else %}
+                    <div class="prisoner-card">
+                        <div class="id-card-header">
+                            <i class="bi bi-person-vcard-fill"></i>
+                            <h6>PRISONER IDENTIFICATION CARD</h6>
+                        </div>
+                {% endif %}
+                    
+                    <!-- ID Card Body -->
+                    <div class="id-card-body">
+                        <div class="id-photo-section">
+                            {% if user.related_prisoner and user.related_prisoner.id == prisoner.id %}
+                                <div class="id-photo-frame family-member">
+                            {% else %}
+                                <div class="id-photo-frame">
+                            {% endif %}
+                                {% if prisoner.photo %}
+                                    <img src="{{ prisoner.photo.url }}" class="prisoner-photo" alt="{{ prisoner.first_name }}">
+                                {% else %}
+                                    {% if user.related_prisoner and user.related_prisoner.id == prisoner.id %}
+                                        <div class="prisoner-photo-placeholder family-member">
+                                    {% else %}
+                                        <div class="prisoner-photo-placeholder">
+                                    {% endif %}
+                                        {{ prisoner.first_name|first }}{{ prisoner.last_name|first }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="id-details-section">
+                            <div class="prisoner-name-block">
+                                <h5 class="prisoner-name">{{ prisoner.first_name }} {{ prisoner.last_name }}</h5>
+                                <div class="prisoner-id-badge">
+                                    <i class="bi bi-hash"></i>
+                                    <span>{{ prisoner.prisoner_id }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="id-info-grid">
+                                <div class="id-info-item">
+                                    <div class="id-info-icon">
+                                        <i class="bi bi-calendar3"></i>
+                                    </div>
+                                    <div class="id-info-content">
+                                        <div class="id-info-label">Date of Birth</div>
+                                        <div class="id-info-value">{{ prisoner.date_of_birth|date:"d M Y" }}</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="id-info-item">
+                                    <div class="id-info-icon">
+                                        <i class="bi bi-building"></i>
+                                    </div>
+                                    <div class="id-info-content">
+                                        <div class="id-info-label">Facility Location</div>
+                                        <div class="id-info-value">{{ prisoner.jail.name }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Visit Request Section -->
+                    <div class="visit-request-section">
+                        <div class="visit-request-header">
+                            <i class="bi bi-calendar-check-fill"></i>
+                            <h6>REQUEST VISIT APPOINTMENT</h6>
+                        </div>
+                        
+                        <!-- Emergency Info Box -->
+                        <div class="emergency-info-box" id="emergency_info_{{ prisoner.id }}">
+                            <h6>
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                Emergency Visit - Important Information
+                            </h6>
+                            <ul>
+                                <li>Visit must be completed within <strong>24 hours</strong> of approval</li>
+                                <li>No date/time selection needed - immediate priority processing</li>
+                                <li>You will be notified within 2-4 hours of approval status</li>
+                                <li>20-day cooldown period applies after emergency visit</li>
+                                <li>Valid only for genuine emergency situations</li>
+                            </ul>
+                        </div>
+                        
+                        <form method="post" class="visit-form" id="visit_form_{{ prisoner.id }}">
+                            {% csrf_token %}
+                            <input type="hidden" name="prisoner_id" value="{{ prisoner.id }}">
+                            
+                            <div class="form-row" id="datetime_section_{{ prisoner.id }}">
+                                <div class="form-group">
+                                    <label for="visit_date_{{ prisoner.id }}">
+                                        <i class="bi bi-calendar-event"></i>
+                                        Visit Date
+                                    </label>
+                                    <input type="date" name="visit_date" id="visit_date_{{ prisoner.id }}" 
+                                           class="form-control" min="{% now 'Y-m-d' %}">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="time_slot_{{ prisoner.id }}">
+                                        <i class="bi bi-clock"></i>
+                                        Time Slot
+                                    </label>
+                                    <select name="time_slot" id="time_slot_{{ prisoner.id }}" class="form-select">
+                                        <option value="">-- Select Time --</option>
+                                        <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+                                        <option value="02:00 PM - 03:00 PM">02:00 PM - 03:00 PM</option>
+                                        <option value="04:00 PM - 05:00 PM">04:00 PM - 05:00 PM</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            {% if user.related_prisoner and user.relationship_to_prisoner and user.related_prisoner.id == prisoner.id %}
+                                {% if can_request_emergency %}
+                                    <div class="visit-actions has-emergency">
+                                        <input type="hidden" name="visit_type" id="visit_type_{{ prisoner.id }}" value="REGULAR">
+                                        
+                                        <button type="button" class="btn btn-success" onclick="setRegularVisit('{{ prisoner.id }}')">
+                                            <i class="bi bi-calendar-check"></i>
+                                            REGULAR VISIT
+                                        </button>
+                                        
+                                        <button type="button" class="btn btn-warning btn-emergency" onclick="setEmergencyVisit('{{ prisoner.id }}', '{{ user.relationship_to_prisoner }}')">
+                                            <i class="bi bi-exclamation-triangle-fill"></i>
+                                            EMERGENCY VISIT
+                                        </button>
+                                    </div>
+                                {% else %}
+                                    <div class="emergency-locked-message">
+                                        <i class="bi bi-lock-fill lock-icon"></i>
+                                        <h6>🚨 Emergency Visit Temporarily Unavailable</h6>
+                                        <p>
+                                            You have recently used an emergency visit request.<br>
+                                            Emergency visits are limited to once every 20 days for security reasons.
+                                        </p>
+                                        
+                                        {% if last_emergency_date %}
+                                        <div class="last-emergency-info">
+                                            <p>
+                                                <i class="bi bi-calendar-x"></i> 
+                                                <strong>Last Emergency Visit:</strong> {{ last_emergency_date|date:"F d, Y" }}
+                                            </p>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <div class="countdown-timer">
+                                            ⏱️ Next emergency visit available in: <strong>{{ days_until_next_emergency }} day{{ days_until_next_emergency|pluralize }}</strong>
+                                            
+                                            {% if next_available_date %}
+                                            <small>
+                                                📅 Available from: <strong>{{ next_available_date|date:"F d, Y" }}</strong>
+                                            </small>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <p style="margin-top: 0.75rem; font-size: 0.85rem;">
+                                            <i class="bi bi-info-circle"></i> You can still request regular visits during this period
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="visit-actions no-emergency">
+                                        <input type="hidden" name="visit_type" value="REGULAR">
+                                        <button type="submit" class="btn btn-success" onclick="return validateRegularVisit('{{ prisoner.id }}')">
+                                            <i class="bi bi-calendar-check"></i>
+                                            REQUEST REGULAR VISIT
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="visit-actions no-emergency">
+                                    <input type="hidden" name="visit_type" value="REGULAR">
+                                    <button type="submit" class="btn btn-success" onclick="return validateRegularVisit('{{ prisoner.id }}')">
+                                        <i class="bi bi-calendar-check"></i>
+                                        REQUEST VISIT
+                                    </button>
+                                    <small style="color: var(--text-muted); text-align: center; margin-top: 0.5rem; display: block;">
+                                        <i class="bi bi-info-circle"></i>
+                                        Emergency visits available for family members only
+                                    </small>
+                                </div>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+        {% elif search_query and selected_jail %}
+            <div class="info-state">
+                <i class="bi bi-person-x-fill"></i>
+                <h4>NO PRISONERS FOUND</h4>
+                <p>No prisoners found with name "{{ search_query }}" in selected facility.</p>
+                <button class="btn btn-primary" onclick="clearSearch()">
+                    <i class="bi bi-arrow-left me-2"></i>TRY AGAIN
+                </button>
+            </div>
+
+        {% else %}
+            <div class="info-state">
+                <i class="bi bi-search"></i>
+                <h4>READY TO SEARCH</h4>
+                <p>Use the search form above to find prisoners and request visits.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchForm = document.getElementById('search-form');
+    const searchBtn = document.getElementById('search-btn');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const resultsContainer = document.querySelector('.results-container');
+    
+    searchForm.addEventListener('submit', function() {
+        loadingSpinner.style.display = 'block';
+        resultsContainer.style.display = 'none';
+        searchBtn.disabled = true;
+        searchBtn.innerHTML = '<i class="bi bi-search me-2"></i>Searching...';
+    });
+    
+    document.querySelectorAll('input[type="date"]').forEach(input => {
+        const today = new Date().toISOString().split('T')[0];
+        const maxDate = new Date();
+        maxDate.setDate(maxDate.getDate() + 30);
+        input.setAttribute('min', today);
+        input.setAttribute('max', maxDate.toISOString().split('T')[0]);
+    });
+    
+    document.querySelectorAll('.btn-emergency').forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            this.style.boxShadow = '0 0 20px rgba(255, 193, 7, 0.5)';
+        });
+        btn.addEventListener('mouseleave', function() {
+            this.style.boxShadow = '';
+        });
+    });
+});
+
+// ✅ FIXED: Validate regular visit - DO NOT PREVENT SUBMISSION
+function validateRegularVisit(prisonerId) {
+    const dateInput = document.getElementById(`visit_date_${prisonerId}`);
+    const timeSelect = document.getElementById(`time_slot_${prisonerId}`);
+    
+    if (!dateInput.value) {
+        alert('⚠️ Please select a visit date.');
+        dateInput.focus();
+        return false;
+    }
+    
+    if (!timeSelect.value) {
+        alert('⚠️ Please select a time slot.');
+        timeSelect.focus();
+        return false;
+    }
+    
+    // ✅ Show loading but DON'T prevent submission
+    const form = document.getElementById(`visit_form_${prisonerId}`);
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    if (submitBtn) {
+        // Use setTimeout to allow form submission to happen first
+        setTimeout(() => {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Processing...';
+        }, 0);
+    }
+    
+    console.log('✅ Regular visit form validation passed, submitting...');
+    return true; // Allow form to submit
+}
+
+// ✅ Set regular visit (for two-button layout)
+function setRegularVisit(prisonerId) {
+    const form = document.getElementById(`visit_form_${prisonerId}`);
+    const dateInput = document.getElementById(`visit_date_${prisonerId}`);
+    const timeSelect = document.getElementById(`time_slot_${prisonerId}`);
+    const hiddenInput = document.getElementById(`visit_type_${prisonerId}`);
+    const emergencyInfo = document.getElementById(`emergency_info_${prisonerId}`);
+    
+    console.log('🔍 Regular visit button clicked');
+    
+    if (emergencyInfo) emergencyInfo.style.display = 'none';
+    
+    if (!dateInput.value || !timeSelect.value) {
+        alert('⚠️ Please select both date and time slot for regular visit.');
+        if (!dateInput.value) dateInput.focus();
+        else timeSelect.focus();
+        return false;
+    }
+    
+    hiddenInput.value = 'REGULAR';
+    console.log(`✅ Set visit_type to: ${hiddenInput.value}`);
+    
+    const regularBtn = form.querySelector('.btn-success');
+    if (regularBtn) {
+        regularBtn.disabled = true;
+        regularBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Processing...';
+    }
+    
+    console.log('✅ Submitting regular visit form...');
+    form.submit();
+}
+
+// ✅ Emergency visit
+function setEmergencyVisit(prisonerId, relationship) {
+    console.log('🚨 Emergency button clicked');
+    
+    const form = document.getElementById(`visit_form_${prisonerId}`);
+    const hiddenInput = document.getElementById(`visit_type_${prisonerId}`);
+    const emergencyInfo = document.getElementById(`emergency_info_${prisonerId}`);
+    const dateTimeSection = document.getElementById(`datetime_section_${prisonerId}`);
+    
+    if (emergencyInfo) emergencyInfo.style.display = 'block';
+    
+    const relationshipText = relationship.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    
+    const confirmed = confirm(`🚨 EMERGENCY VISIT REQUEST
+
+👤 Your Relationship: ${relationshipText}
+
+⚠️ CRITICAL INFORMATION:
+
+✓ Visit must be completed within 24 HOURS of approval
+✓ NO date/time selection needed - immediate priority processing  
+✓ Prison administration will contact you within 2-4 hours
+✓ Once approved, you MUST visit within 24 hours
+✓ 20-day cooldown period applies after this visit
+✓ Should ONLY be used for genuine family emergencies
+
+📍 IMPORTANT NOTES:
+• Bring a valid ID proof showing the relationship ✅
+• Subject to security clearance and availability
+• Misuse may result in permanent loss of emergency visit privileges
+• This request will be reviewed by prison administration
+
+⚠️ WARNING: False emergency requests are taken seriously and may result in criminal charges.
+
+Do you confirm this is a genuine emergency situation requiring immediate visit?`);
+    
+    if (confirmed) {
+        console.log('✅ Emergency visit confirmed');
+        
+        hiddenInput.value = 'EMERGENCY';
+        
+        const dateInput = document.getElementById(`visit_date_${prisonerId}`);
+        const timeSelect = document.getElementById(`time_slot_${prisonerId}`);
+        
+        if (dateInput) dateInput.removeAttribute('required');
+        if (timeSelect) timeSelect.removeAttribute('required');
+        
+        if (dateTimeSection) {
+            dateTimeSection.style.opacity = '0.3';
+            dateTimeSection.style.pointerEvents = 'none';
+        }
+        
+        const emergencyBtn = form.querySelector('.btn-emergency');
+        if (emergencyBtn) {
+            emergencyBtn.disabled = true;
+            emergencyBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Processing Emergency...';
+        }
+        
+        console.log(`✅ Submitting EMERGENCY visit - no date/time required`);
+        form.submit();
+    } else {
+        console.log('❌ Emergency visit cancelled');
+        if (emergencyInfo) emergencyInfo.style.display = 'none';
+    }
+}
+
+function clearSearch() {
+    document.getElementById('prisoner_name').value = '';
+    document.getElementById('jail').value = '';
+    document.getElementById('prisoner_name').focus();
+}
+</script>
+
+{% endblock %}

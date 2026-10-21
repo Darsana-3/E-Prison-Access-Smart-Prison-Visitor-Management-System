@@ -1,0 +1,728 @@
+{% extends "base.html" %}
+{% block title %}Review Visit Details{% endblock %}
+
+{% block content %}
+<style>
+/* Dark Prison Theme - Enhanced Text Visibility */
+:root {
+    --bg-dark: #1a1a1a;
+    --bg-card: #2d2d2d;
+    --bg-input: #404040;
+    --bg-accent: #363636;
+    --bg-light: #3a3a3a;
+    --border: #555;
+    --text-white: #ffffff;
+    --text-bright: #f8f9fa;
+    --text-light: #e9ecef;
+    --text-muted: #d6d8db;
+    --text-gray: #adb5bd;
+    --primary: #0066cc;
+    --success: #28a745;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --info: #17a2b8;
+}
+
+body {
+    background: var(--bg-dark) !important;
+    color: var(--text-white) !important;
+}
+
+/* Page Header */
+.page-header {
+    background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-accent) 100%);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-top: 4px solid var(--info);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.page-header h2 {
+    color: var(--text-white) !important;
+    font-weight: 700 !important;
+    margin-bottom: 0 !important;
+    font-size: 1.6rem !important;
+}
+
+.btn-back {
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    color: var(--text-white) !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-back:hover {
+    background: var(--border) !important;
+    color: var(--text-white) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Main Review Card */
+.review-card {
+    background: var(--bg-card) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4) !important;
+    overflow: hidden;
+}
+
+.review-card .card-header {
+    background: linear-gradient(135deg, var(--bg-input) 0%, var(--bg-accent) 100%) !important;
+    border-bottom: 2px solid var(--border) !important;
+    color: var(--text-white) !important;
+    padding: 1.5rem !important;
+}
+
+.review-card .card-header h4 {
+    color: var(--text-white) !important;
+    font-weight: 600 !important;
+    margin-bottom: 0 !important;
+}
+
+.status-pending {
+    color: var(--warning) !important;
+    background: rgba(255, 193, 7, 0.2) !important;
+    padding: 0.25rem 0.75rem !important;
+    border-radius: 15px !important;
+    font-weight: 600 !important;
+}
+
+.review-card .card-body {
+    background: var(--bg-card) !important;
+    color: var(--text-white) !important;
+    padding: 2rem !important;
+}
+
+/* Detail Cards */
+.detail-card {
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
+    height: 100% !important;
+    transition: all 0.3s ease !important;
+}
+
+.detail-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4) !important;
+    border-color: var(--primary) !important;
+}
+
+.detail-card .card-header {
+    background: linear-gradient(135deg, var(--bg-accent) 0%, var(--bg-input) 100%) !important;
+    border-bottom: 2px solid var(--border) !important;
+    color: var(--text-white) !important;
+    padding: 1rem 1.5rem !important;
+}
+
+.detail-card .card-header h5 {
+    color: var(--text-white) !important;
+    font-weight: 600 !important;
+    margin-bottom: 0 !important;
+    font-size: 1.1rem !important;
+}
+
+.detail-card .card-body {
+    background: transparent !important;
+    color: var(--text-white) !important;
+    padding: 1.5rem !important;
+}
+
+/* Enhanced Text Visibility */
+.visitor-name {
+    color: var(--text-bright) !important;
+    font-weight: 700 !important;
+    font-size: 1.3rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.visitor-email {
+    color: var(--primary) !important;
+    font-weight: 600 !important;
+    margin-bottom: 1rem !important;
+    font-size: 1rem !important;
+}
+
+/* FIXED - All Detail Labels and Values Now Highly Visible */
+.detail-label {
+    color: var(--text-bright) !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.8px !important;
+    margin-bottom: 0.75rem !important;
+    background: var(--bg-accent) !important;
+    padding: 0.5rem 0.75rem !important;
+    border-radius: 4px !important;
+    border-left: 3px solid var(--primary) !important;
+}
+
+.detail-value {
+    color: var(--text-bright) !important;
+    font-weight: 600 !important;
+    font-size: 1.1rem !important;
+    line-height: 1.4 !important;
+}
+
+/* FIXED - Prisoner Information with High Visibility */
+.prisoner-info {
+    background: var(--bg-accent) !important;
+    padding: 1.25rem !important;
+    border-radius: 8px !important;
+    border-left: 4px solid var(--info) !important;
+    border: 2px solid var(--border) !important;
+}
+
+.prisoner-info .detail-value {
+    color: var(--text-bright) !important;
+    font-weight: 700 !important;
+    font-size: 1.2rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+/* FIXED - Prisoner ID with Maximum Visibility */
+.prisoner-id {
+    color: var(--text-bright) !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    background: var(--bg-input) !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 6px !important;
+    border: 2px solid var(--border) !important;
+    display: inline-block !important;
+    font-family: 'Courier New', monospace !important;
+    letter-spacing: 1px !important;
+}
+
+/* Enhanced Information Sections */
+.visit-datetime {
+    background: var(--bg-accent) !important;
+    padding: 1.25rem !important;
+    border-radius: 8px !important;
+    border-left: 4px solid var(--warning) !important;
+    border: 2px solid var(--border) !important;
+}
+
+.visit-datetime .detail-value {
+    color: var(--text-bright) !important;
+    font-weight: 600 !important;
+    font-size: 1.1rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.facility-info {
+    background: var(--bg-accent) !important;
+    padding: 1.25rem !important;
+    border-radius: 8px !important;
+    border-left: 4px solid var(--success) !important;
+    border: 2px solid var(--border) !important;
+}
+
+.facility-info .detail-value {
+    color: var(--text-bright) !important;
+    font-weight: 600 !important;
+    font-size: 1.1rem !important;
+}
+
+/* Enhanced Muted Text for Better Visibility */
+.text-muted,
+.visitor-address {
+    color: var(--text-muted) !important;
+    font-weight: 500 !important;
+    font-size: 0.95rem !important;
+}
+
+.visitor-address {
+    background: var(--bg-accent) !important;
+    padding: 1rem !important;
+    border-radius: 6px !important;
+    border-left: 4px solid var(--primary) !important;
+    border: 2px solid var(--border) !important;
+    margin-bottom: 1rem !important;
+}
+
+/* Other Enhanced Elements */
+.visitor-photo {
+    width: 140px !important;
+    height: 140px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    border: 4px solid var(--border) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+    margin-bottom: 1rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.visitor-photo:hover {
+    transform: scale(1.05) !important;
+    border-color: var(--primary) !important;
+}
+
+.visitor-placeholder {
+    width: 140px !important;
+    height: 140px !important;
+    background: var(--bg-accent) !important;
+    border: 4px solid var(--border) !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 auto 1rem !important;
+    color: var(--text-gray) !important;
+    font-size: 4rem !important;
+}
+
+.family-badge {
+    background: var(--success) !important;
+    color: white !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 20px !important;
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin-bottom: 1rem !important;
+    display: inline-block !important;
+}
+
+.id-proof-section {
+    background: var(--bg-accent) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 8px !important;
+    padding: 1.25rem !important;
+    margin-top: 1rem !important;
+    text-align: center !important;
+}
+
+.btn-view-id {
+    background: linear-gradient(135deg, var(--primary) 0%, #0056b3 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 6px !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.btn-view-id:hover {
+    background: linear-gradient(135deg, #0056b3 0%, var(--primary) 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4) !important;
+    color: white !important;
+}
+
+.no-id-proof {
+    color: var(--text-bright) !important;
+    font-weight: 700 !important;
+    background: rgba(220, 53, 69, 0.2) !important;
+    padding: 1rem !important;
+    border-radius: 6px !important;
+    border: 2px solid var(--danger) !important;
+}
+
+.detail-section {
+    margin-bottom: 1.5rem !important;
+    padding-bottom: 1rem !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+
+.detail-section:last-child {
+    border-bottom: none !important;
+}
+
+/* Success/Info Text Enhancements */
+.text-success {
+    color: var(--success) !important;
+    font-weight: 600 !important;
+}
+
+.text-info {
+    color: var(--info) !important;
+    font-weight: 600 !important;
+}
+
+.text-warning {
+    color: var(--warning) !important;
+    font-weight: 600 !important;
+}
+
+/* Action Footer */
+.action-footer {
+    background: linear-gradient(135deg, var(--bg-input) 0%, var(--bg-accent) 100%) !important;
+    border-top: 2px solid var(--border) !important;
+    color: var(--text-white) !important;
+    padding: 2rem !important;
+    text-align: center !important;
+}
+
+.action-footer h4 {
+    color: var(--text-white) !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.action-footer p {
+    color: var(--text-muted) !important;
+    margin-bottom: 2rem !important;
+}
+
+.btn-approve {
+    background: linear-gradient(135deg, var(--success) 0%, #218838 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 1rem 2rem !important;
+    border-radius: 8px !important;
+    font-size: 1.1rem !important;
+    margin: 0 0.5rem !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.btn-approve:hover {
+    background: linear-gradient(135deg, #218838 0%, var(--success) 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4) !important;
+    color: white !important;
+}
+
+.btn-reject {
+    background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 1rem 2rem !important;
+    border-radius: 8px !important;
+    font-size: 1.1rem !important;
+    margin: 0 0.5rem !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.btn-reject:hover {
+    background: linear-gradient(135deg, #c82333 0%, var(--danger) 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 15px rgba(220, 53, 69, 0.4) !important;
+    color: white !important;
+}
+
+.emergency-badge {
+    background: var(--danger) !important;
+    color: white !important;
+    padding: 0.4rem 0.8rem !important;
+    border-radius: 20px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    animation: pulse 2s infinite !important;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 1rem;
+        text-align: center;
+    }
+    
+    .page-header h2 {
+        font-size: 1.3rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .review-card .card-body {
+        padding: 1.5rem !important;
+    }
+    
+    .detail-card .card-body {
+        padding: 1rem !important;
+    }
+    
+    .visitor-photo,
+    .visitor-placeholder {
+        width: 100px !important;
+        height: 100px !important;
+    }
+    
+    .action-footer {
+        padding: 1.5rem !important;
+    }
+    
+    .btn-approve,
+    .btn-reject {
+        display: block !important;
+        width: 100% !important;
+        margin: 0.5rem 0 !important;
+    }
+}
+</style>
+
+<!-- Page Header -->
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <h2><i class="bi bi-clipboard-data me-2"></i>REVIEW VISIT REQUEST</h2>
+        <a href="{% url 'review_visits' %}" class="btn btn-back">
+            <i class="bi bi-arrow-left me-2"></i>Back to List
+        </a>
+    </div>
+</div>
+
+<!-- Main Review Card -->
+<div class="card review-card">
+    <div class="card-header">
+        <h4>
+            <i class="bi bi-file-earmark-person me-2"></i>
+            Request #{{ visit.id }} - Status: <span class="status-pending">PENDING REVIEW</span>
+            {% if visit.visit_type == 'EMERGENCY' %}
+                <span class="emergency-badge ms-2">
+                    <i class="bi bi-exclamation-triangle me-1"></i>Emergency
+                </span>
+            {% endif %}
+        </h4>
+    </div>
+    
+    <div class="card-body">
+        <div class="row g-4">
+            <!-- Visitor Details Column -->
+            <div class="col-lg-6">
+                <div class="card detail-card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-person-badge me-2"></i>VISITOR INFORMATION</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <!-- Visitor Photo -->
+                        {% if visit.visitor.profile_photo %}
+                            <img src="{{ visit.visitor.profile_photo.url }}" 
+                                 class="visitor-photo" 
+                                 alt="Visitor Photo"
+                                 onclick="openImageModal(this.src)">
+                        {% else %}
+                            <div class="visitor-placeholder">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Visitor Details -->
+                        <div class="visitor-name">{{ visit.visitor.full_name|default:visit.visitor.username }}</div>
+                        <div class="visitor-email">{{ visit.visitor.email }}</div>
+                        
+                        {% if visit.visitor.is_family_member %}
+                            <span class="family-badge">
+                                <i class="bi bi-people-fill me-1"></i>Family Member
+                            </span>
+                        {% endif %}
+                        
+                        <!-- Address -->
+                        <div class="detail-section">
+                            <div class="detail-label">
+                                <i class="bi bi-geo-alt me-1"></i>Address
+                            </div>
+                            <div class="visitor-address">{{ visit.visitor.address }}</div>
+                        </div>
+
+                        <!-- ID Proof Section -->
+                        <div class="id-proof-section">
+                            <div class="detail-label">
+                                <i class="bi bi-card-text me-1"></i>Identity Verification
+                            </div>
+                            {% if visit.visitor.id_proof %}
+                                <a href="{{ visit.visitor.id_proof.url }}" 
+                                   class="btn btn-view-id" 
+                                   target="_blank"
+                                   onclick="trackIDView('{{ visit.id }}')">
+                                    <i class="bi bi-file-earmark-person me-2"></i>View ID Document
+                                </a>
+                                <div class="mt-2">
+                                    <small class="text-success">
+                                        <i class="bi bi-check-circle me-1"></i>ID Document Uploaded
+                                    </small>
+                                </div>
+                            {% else %}
+                                <div class="no-id-proof">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    NO ID PROOF UPLOADED - HIGH RISK
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visit & Prisoner Details Column -->
+            <div class="col-lg-6">
+                <div class="card detail-card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-calendar-check me-2"></i>VISIT DETAILS</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Prisoner Information -->
+                        <div class="detail-section">
+                            <div class="detail-label">
+                                <i class="bi bi-person-lock me-1"></i>Prisoner to Visit
+                            </div>
+                            <div class="prisoner-info">
+                                <div class="detail-value">
+                                    {{ visit.prisoner.first_name }} {{ visit.prisoner.last_name }}
+                                </div>
+                                <div class="prisoner-id mt-2">
+                                    <i class="bi bi-hash me-1"></i>Prisoner ID: {{ visit.prisoner.prisoner_id }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Visit Date & Time -->
+                        <div class="detail-section">
+                            <div class="detail-label">
+                                <i class="bi bi-calendar-event me-1"></i>Requested Date & Time
+                            </div>
+                            <div class="visit-datetime">
+                                <div class="detail-value">
+                                    <i class="bi bi-calendar3 me-2"></i>
+                                    {{ visit.visit_date|date:"l, F d, Y" }}
+                                </div>
+                                <div class="detail-value mt-2">
+                                    <i class="bi bi-clock me-2"></i>
+                                    {{ visit.visit_time_slot }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Facility Information -->
+                        <div class="detail-section">
+                            <div class="detail-label">
+                                <i class="bi bi-building me-1"></i>Facility
+                            </div>
+                            <div class="facility-info">
+                                <div class="detail-value">
+                                    {{ visit.prisoner.jail.name }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Request Details -->
+                        <div class="detail-section">
+                            <div class="detail-label">
+                                <i class="bi bi-info-circle me-1"></i>Request Information
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <small class="text-muted" style="color: var(--text-muted) !important; font-weight: 600;">Submitted:</small>
+                                    <div class="detail-value">{{ visit.created_at|date:"M d, Y" }}</div>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted" style="color: var(--text-muted) !important; font-weight: 600;">Type:</small>
+                                    <div class="detail-value">
+                                        {% if visit.visit_type == 'EMERGENCY' %}
+                                            <span class="text-warning">Emergency Visit</span>
+                                        {% else %}
+                                            <span class="text-info">Regular Visit</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Footer -->
+    <div class="card-footer action-footer">
+        <h4><i class="bi bi-gavel me-2"></i>ADMINISTRATIVE DECISION</h4>
+        <p>Review all information above and make your decision on this visit request.</p>
+        
+        <div class="action-buttons">
+            <a href="{% url 'decide_visit' visit.id 'approve' %}" 
+               class="btn btn-approve"
+               onclick="return confirm('Are you sure you want to APPROVE this visit request?')">
+                <i class="bi bi-check-lg me-2"></i>Approve Request
+            </a>
+            
+            <a href="{% url 'decide_visit' visit.id 'reject' %}" 
+               class="btn btn-reject"
+               onclick="return confirm('Are you sure you want to REJECT this visit request?')">
+                <i class="bi bi-x-lg me-2"></i>Reject Request
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Image Modal for Visitor Photo -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h5 class="modal-title text-white">Visitor Photo</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid rounded" alt="Visitor Photo">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add loading animation to cards
+    const detailCards = document.querySelectorAll('.detail-card');
+    detailCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 200);
+    });
+
+    // Enhanced button interactions
+    const actionButtons = document.querySelectorAll('.btn-approve, .btn-reject');
+    actionButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const originalText = this.innerHTML;
+            const isApprove = this.classList.contains('btn-approve');
+            
+            this.innerHTML = isApprove ? 
+                '<i class="bi bi-hourglass-split me-2"></i>Processing Approval...' :
+                '<i class="bi bi-hourglass-split me-2"></i>Processing Rejection...';
+            this.disabled = true;
+            
+            // Re-enable if user cancels
+            setTimeout(() => {
+                this.innerHTML = originalText;
+                this.disabled = false;
+            }, 5000);
+        });
+    });
+});
+
+// Image modal functionality
+function openImageModal(imageSrc) {
+    const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+    document.getElementById('modalImage').src = imageSrc;
+    modal.show();
+}
+
+// Track ID document views for audit
+function trackIDView(visitId) {
+    console.log(`ID document viewed for visit request #${visitId}`);
+    // You can add AJAX call here to log the view
+}
+</script>
+{% endblock %}

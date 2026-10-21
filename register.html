@@ -1,0 +1,1066 @@
+{% extends "accounts/auth_base.html" %}
+{% block title %}Visitor Registration Portal{% endblock %}
+
+{% block content %}
+<style>
+/* Enhanced Prison Dark Theme with Perfect Input Styling */
+:root {
+    --bg-dark: #1a1a1a;
+    --bg-card: #2d2d2d;
+    --bg-input: #3a3a3a;
+    --bg-input-focus: #404040;
+    --border: #666;
+    --border-focus: #0099ff;
+    --border-error: #ff4444;
+    --text-white: #ffffff;
+    --text-light: #f0f0f0;
+    --text-muted: #cccccc;
+    --primary: #0099ff;
+    --danger: #ff4444;
+    --success: #00cc44;
+    --warning: #ffaa00;
+}
+
+body { 
+    background: var(--bg-dark) !important; 
+    color: var(--text-white) !important; 
+}
+
+.card { 
+    background: var(--bg-card) !important; 
+    border: 2px solid var(--border) !important; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5) !important;
+}
+
+.card-body {
+    background: var(--bg-card) !important;
+    color: var(--text-white) !important;
+}
+
+.auth-header {
+    background: var(--bg-card) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 8px !important;
+    padding: 1.5rem !important;
+    margin-bottom: 1rem !important;
+    text-align: center !important;
+}
+
+.auth-header h3 {
+    color: var(--text-white) !important;
+    font-weight: 600 !important;
+    margin: 0.5rem 0 !important;
+    font-size: 1.4rem !important;
+}
+
+.auth-header .text-muted {
+    color: var(--text-muted) !important;
+}
+
+/* ENHANCED - Aadhar Security Notice */
+.aadhar-notice {
+    background: linear-gradient(135deg, rgba(255, 170, 0, 0.1) 0%, rgba(220, 53, 69, 0.1) 100%);
+    border: 2px solid var(--warning);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.aadhar-notice h5 {
+    color: var(--warning) !important;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.aadhar-notice .badge {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+}
+
+/* PERFECTED - Form Labels */
+.form-label,
+label.form-label,
+label {
+    color: var(--text-white) !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.75rem !important;
+    font-size: 1rem !important;
+    display: block !important;
+    background: none !important;
+    line-height: 1.4;
+}
+
+.form-label * {
+    color: var(--text-white) !important;
+}
+
+.form-label i,
+label i {
+    color: var(--primary) !important;
+    margin-right: 0.5rem !important;
+}
+
+.form-label.required-field {
+    border-left: 3px solid var(--primary);
+    padding-left: 0.75rem;
+    background: rgba(0, 153, 255, 0.05);
+    border-radius: 4px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+/* PERFECTED - Input Field Styling */
+.form-control {
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    color: var(--text-white) !important;
+    padding: 1rem 1.25rem !important;
+    border-radius: 8px !important;
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+    transition: all 0.3s ease !important;
+    width: 100% !important;
+    font-family: inherit !important;
+    box-sizing: border-box !important;
+}
+
+.form-control:focus {
+    background: var(--bg-input-focus) !important;
+    border-color: var(--border-focus) !important;
+    color: var(--text-white) !important;
+    box-shadow: 0 0 0 0.25rem rgba(0, 153, 255, 0.25) !important;
+    outline: none !important;
+    transform: translateY(-1px);
+}
+
+.form-control:hover:not(:focus) {
+    border-color: #888;
+    background: var(--bg-input-focus);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 0.8 !important;
+    font-style: italic;
+}
+
+.form-control.is-invalid {
+    border-color: var(--border-error) !important;
+    background: rgba(255, 68, 68, 0.05) !important;
+}
+
+.form-control.is-invalid:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255, 68, 68, 0.25) !important;
+}
+
+/* PERFECTED - Text Input Specific Styling */
+input[type="text"].form-control,
+input[type="email"].form-control,
+input[type="tel"].form-control,
+input[type="password"].form-control {
+    height: 3.5rem !important;
+    padding: 1rem 1.25rem !important;
+    font-size: 1rem !important;
+}
+
+/* 👁️ PASSWORD VISIBILITY TOGGLE */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper .form-control {
+    padding-right: 3.5rem !important;
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 3.5rem;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    z-index: 10;
+}
+
+.password-toggle-btn:hover {
+    color: var(--primary);
+    background: rgba(0, 153, 255, 0.1);
+    border-radius: 0 6px 6px 0;
+}
+
+.password-toggle-btn:active {
+    transform: scale(0.95);
+}
+
+.password-toggle-btn i {
+    transition: all 0.3s ease;
+}
+
+/* PERFECTED - Textarea Styling */
+textarea.form-control {
+    min-height: 120px !important;
+    max-height: 200px !important;
+    resize: vertical !important;
+    padding: 1rem 1.25rem !important;
+    font-family: inherit !important;
+    line-height: 1.6 !important;
+}
+
+/* PERFECTED - Select Dropdown Styling */
+select.form-control {
+    height: 3.5rem !important;
+    padding: 1rem 1.25rem !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 1rem center !important;
+    background-size: 16px 12px !important;
+    appearance: none !important;
+    cursor: pointer !important;
+}
+
+select.form-control option {
+    background: var(--bg-card) !important;
+    color: var(--text-white) !important;
+    padding: 0.5rem !important;
+}
+
+/* PERFECTED - File Input Styling */
+.form-control[type="file"] {
+    padding: 0.75rem 1rem !important;
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    color: var(--text-white) !important;
+    cursor: pointer !important;
+    height: auto !important;
+    font-size: 0.95rem !important;
+}
+
+.form-control[type="file"]:hover {
+    border-color: var(--primary);
+    background: rgba(0, 153, 255, 0.05);
+}
+
+.form-control[type="file"]:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 0.25rem rgba(0, 153, 255, 0.25);
+}
+
+.form-control[type="file"]::-webkit-file-upload-button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    margin-right: 1rem;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.form-control[type="file"]::-webkit-file-upload-button:hover {
+    background: #0088dd;
+}
+
+/* ENHANCED - Image Upload Areas */
+.image-upload-section {
+    background: var(--bg-input);
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.image-upload-section:hover {
+    border-color: var(--primary);
+    background: rgba(0, 153, 255, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 153, 255, 0.2);
+}
+
+.image-upload-section.aadhar-upload {
+    border-color: var(--warning);
+}
+
+.image-upload-section.aadhar-upload:hover {
+    border-color: var(--warning);
+    background: rgba(255, 170, 0, 0.05);
+    box-shadow: 0 4px 12px rgba(255, 170, 0, 0.2);
+}
+
+.image-upload-section .form-control[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* PERFECTED - Checkbox Styling */
+.form-check {
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 12px !important;
+    padding: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+    transition: all 0.3s ease;
+}
+
+.form-check:hover {
+    border-color: var(--primary);
+    background: rgba(0, 153, 255, 0.05);
+}
+
+.form-check-input {
+    background: var(--bg-card) !important;
+    border: 2px solid var(--border) !important;
+    width: 24px !important;
+    height: 24px !important;
+    margin-top: 0.125rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.form-check-input:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 0.25rem rgba(0, 153, 255, 0.25) !important;
+}
+
+.form-check-input:checked {
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+}
+
+.form-check-label {
+    color: var(--text-white) !important;
+    margin-left: 0.75rem !important;
+    font-weight: 500 !important;
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+}
+
+/* ENHANCED - Button Styling */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, #0088dd 100%) !important;
+    border: 2px solid var(--primary) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 1rem 2rem !important;
+    border-radius: 8px !important;
+    font-size: 1.1rem !important;
+    transition: all 0.3s ease;
+    min-height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0088dd 0%, #0066bb 100%) !important;
+    border-color: #0088dd !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 153, 255, 0.4);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-outline-primary {
+    color: var(--primary) !important;
+    border: 2px solid var(--primary) !important;
+    background: transparent !important;
+    font-weight: 500 !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: white !important;
+    transform: translateY(-1px);
+}
+
+/* Enhanced Alerts */
+.alert-danger {
+    background: rgba(255, 68, 68, 0.15) !important;
+    color: #ffcccc !important;
+    border: 2px solid var(--danger) !important;
+    border-radius: 8px !important;
+    padding: 1rem 1.25rem !important;
+}
+
+/* Enhanced Text Colors */
+.text-danger {
+    color: #ffaaaa !important;
+    font-weight: 500 !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.text-primary {
+    color: var(--primary) !important;
+}
+
+/* Enhanced Links */
+a {
+    color: var(--primary) !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: #66bbff !important;
+    text-decoration: underline !important;
+}
+
+/* Enhanced HR */
+hr {
+    border-color: var(--border) !important;
+    opacity: 1 !important;
+    margin: 2rem 0 !important;
+}
+
+/* Enhanced Info Box */
+.info-box {
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 8px !important;
+    padding: 1.25rem !important;
+    margin: 1.5rem 0 !important;
+}
+
+.info-box strong {
+    color: var(--text-white) !important;
+}
+
+/* Enhanced Help Text */
+.help-text {
+    color: var(--text-muted) !important;
+    font-size: 0.875rem !important;
+    margin-top: 0.5rem !important;
+    line-height: 1.5 !important;
+    font-style: italic;
+}
+
+/* Enhanced Required Asterisk */
+.required {
+    color: var(--danger) !important;
+    font-weight: bold !important;
+    margin-left: 0.25rem;
+}
+
+/* Form Sections */
+.form-section {
+    background: rgba(0, 153, 255, 0.03);
+    border: 1px solid rgba(0, 153, 255, 0.2);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+}
+
+.form-section:hover {
+    background: rgba(0, 153, 255, 0.05);
+    border-color: rgba(0, 153, 255, 0.3);
+}
+
+.form-section h6 {
+    color: var(--primary) !important;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid rgba(0, 153, 255, 0.3);
+    padding-bottom: 0.75rem;
+    font-size: 1.1rem;
+}
+
+/* Form field containers */
+.mb-3 {
+    margin-bottom: 1.75rem !important;
+}
+
+/* Input focus effects */
+.form-control:focus + .help-text {
+    color: var(--primary);
+}
+
+/* Error state styling */
+.has-error .form-control {
+    border-color: var(--danger);
+    background: rgba(255, 68, 68, 0.05);
+}
+
+.has-error .form-label {
+    color: var(--danger);
+}
+
+/* Success state styling */
+.has-success .form-control {
+    border-color: var(--success);
+    background: rgba(0, 204, 68, 0.05);
+}
+
+/* File info display */
+.file-info {
+    background: rgba(0, 204, 68, 0.1);
+    border: 1px solid var(--success);
+    border-radius: 6px;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    color: var(--success);
+    font-size: 0.9rem;
+}
+
+/* Responsive fixes */
+@media (max-width: 768px) {
+    .auth-header h3 {
+        font-size: 1.2rem !important;
+    }
+    
+    .card-body {
+        padding: 1rem !important;
+    }
+    
+    .form-label {
+        font-size: 0.95rem !important;
+    }
+    
+    .aadhar-notice {
+        padding: 1rem;
+        text-align: left;
+    }
+    
+    .form-section {
+        padding: 1.5rem;
+    }
+    
+    .form-control {
+        padding: 0.875rem 1rem !important;
+    }
+    
+    input[type="text"].form-control,
+    input[type="email"].form-control,
+    input[type="tel"].form-control,
+    input[type="password"].form-control {
+        height: 3rem !important;
+    }
+    
+    .password-wrapper .form-control {
+        padding-right: 3rem !important;
+    }
+    
+    .password-toggle-btn {
+        width: 3rem;
+        font-size: 1rem;
+    }
+    
+    .image-upload-section {
+        padding: 1.5rem;
+    }
+}
+
+/* Loading states */
+.form-control.loading {
+    background-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+</style>
+
+<div class="auth-header">
+    <i class="bi bi-person-plus-fill fs-1 text-primary"></i>
+    <h3>Visitor Registration</h3>
+    <p class="text-muted">Kerala Prison Management - New Account Registration</p>
+</div>
+
+<div class="card-body px-4 pb-4">
+    <!-- Enhanced Aadhar Security Notice -->
+    <div class="aadhar-notice">
+        <h5>
+            <i class="bi bi-credit-card me-2"></i>
+            Important: Aadhar Card Required
+        </h5>
+        <p class="mb-3">
+            <strong>New Security Policy:</strong> Only Aadhar Card is accepted as valid identification for visitor registration. 
+            Other ID proofs (PAN Card, Driving License, Passport, etc.) are no longer accepted.
+        </p>
+        <div>
+            <span class="badge bg-danger">
+                <i class="bi bi-exclamation-triangle me-1"></i>
+                Aadhar Card Mandatory
+            </span>
+            <span class="badge bg-warning text-dark">
+                <i class="bi bi-camera me-1"></i>
+                Profile Photo Required
+            </span>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <i class="bi bi-info-circle me-2 text-primary"></i>
+        <strong>Security Notice:</strong> All information will be verified before account activation. Ensure all details match your Aadhar card exactly.
+    </div>
+
+    <form method="post" enctype="multipart/form-data" id="registrationForm">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <strong>Registration Error:</strong>
+                {% for error in form.non_field_errors %}
+                    <br>{{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Personal Information Section -->
+        <div class="form-section">
+            <h6><i class="bi bi-person me-2"></i>Personal Information</h6>
+            
+            {% for field in form %}
+                {% if field.name in "username,first_name,last_name,full_name,email,phone_number,address" %}
+                    <div class="mb-3 {% if field.errors %}has-error{% endif %}">
+                        <label for="{{ field.id_for_label }}" class="form-label {% if field.field.required %}required-field{% endif %}">
+                            {% if field.name == 'username' %}<i class="bi bi-person me-2"></i>
+                            {% elif field.name == 'full_name' or field.name == 'first_name' %}<i class="bi bi-card-text me-2"></i>
+                            {% elif field.name == 'last_name' %}<i class="bi bi-card-text me-2"></i>
+                            {% elif field.name == 'email' %}<i class="bi bi-envelope me-2"></i>
+                            {% elif field.name == 'phone_number' %}<i class="bi bi-telephone me-2"></i>
+                            {% elif field.name == 'address' %}<i class="bi bi-geo-alt me-2"></i>
+                            {% endif %}
+                            {{ field.label }}{% if field.field.required %}<span class="required">*</span>{% endif %}
+                        </label>
+                        {{ field }}
+                        
+                        {% if field.name == 'email' %}
+                            <div class="help-text">Valid email address for account notifications and visit confirmations</div>
+                        {% elif field.name == 'username' %}
+                            <div class="help-text">Choose a unique username (letters, numbers, and @/./+/-/_ allowed)</div>
+                        {% elif field.name == 'phone_number' %}
+                            <div class="help-text">Enter your 10-digit Indian mobile number</div>
+                        {% elif field.name == 'address' %}
+                            <div class="help-text">Enter your complete residential address as per Aadhar card</div>
+                        {% elif field.name == 'first_name' %}
+                            <div class="help-text">First name as mentioned in your Aadhar card</div>
+                        {% elif field.name == 'last_name' %}
+                            <div class="help-text">Last name as mentioned in your Aadhar card</div>
+                        {% elif field.name == 'full_name' %}
+                            <div class="help-text">Full name exactly as mentioned in your Aadhar card</div>
+                        {% endif %}
+                        
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="text-danger mt-2">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Photo Upload Section -->
+        <div class="form-section">
+            <h6><i class="bi bi-camera me-2"></i>Photo Upload</h6>
+            
+            {% for field in form %}
+                {% if field.name == 'profile_photo' %}
+                    <div class="mb-3 {% if field.errors %}has-error{% endif %}">
+                        <label for="{{ field.id_for_label }}" class="form-label required-field">
+                            <i class="bi bi-person-circle me-2"></i>
+                            {{ field.label }}<span class="required">*</span>
+                        </label>
+                        <div class="image-upload-section" id="profileUploadArea">
+                            <i class="bi bi-cloud-upload fs-2 text-primary mb-3"></i>
+                            <h6 class="text-primary mb-2">Upload Profile Photo</h6>
+                            <p class="text-muted mb-3">Click here or drag and drop your photo</p>
+                            {{ field }}
+                        </div>
+                        <div class="help-text">Upload a clear, recent photo of your face for identification (JPEG/PNG format, maximum 3MB, minimum 300x300 pixels)</div>
+                        
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="text-danger mt-2">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Aadhar Card Section -->
+        <div class="form-section">
+            <h6><i class="bi bi-credit-card me-2"></i>Aadhar Card Information</h6>
+            
+            {% for field in form %}
+                {% if field.name == 'aadhar_number' %}
+                    <div class="mb-3 {% if field.errors %}has-error{% endif %}">
+                        <label for="{{ field.id_for_label }}" class="form-label required-field">
+                            <i class="bi bi-credit-card me-2"></i>
+                            {{ field.label }}<span class="required">*</span>
+                            <span class="badge bg-danger ms-2">Only Accepted ID</span>
+                        </label>
+                        {{ field }}
+                        <div class="help-text">{{ field.help_text }}</div>
+                        
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="text-danger mt-2">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% elif field.name == 'id_proof' %}
+                    <div class="mb-3 {% if field.errors %}has-error{% endif %}">
+                        <label for="{{ field.id_for_label }}" class="form-label required-field">
+                            <i class="bi bi-file-earmark-image me-2"></i>
+                            Aadhar Card Image<span class="required">*</span>
+                        </label>
+                        <div class="image-upload-section aadhar-upload" id="aadharUploadArea">
+                            <i class="bi bi-credit-card fs-2 text-warning mb-3"></i>
+                            <h6 class="text-warning mb-2">Upload Aadhar Card Image</h6>
+                            <p class="text-muted mb-3">Click here or drag and drop your Aadhar card image</p>
+                            {{ field }}
+                        </div>
+                        <div class="help-text">Upload clear photo of your Aadhar card (both sides if needed, JPEG/PNG format, maximum 5MB)</div>
+                        
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="text-danger mt-2">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Visitor Type Section -->
+        <div class="form-section">
+            <h6><i class="bi bi-people me-2"></i>Visitor Information</h6>
+            
+            {% for field in form %}
+                {% if field.name == 'role' %}
+                    <div class="mb-3 {% if field.errors %}has-error{% endif %}">
+                        <label for="{{ field.id_for_label }}" class="form-label required-field">
+                            <i class="bi bi-people me-2"></i>
+                            {{ field.label }}<span class="required">*</span>
+                        </label>
+                        {{ field }}
+                        <div class="help-text">Select whether you are a family member or general visitor</div>
+                        
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="text-danger mt-2">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% elif field.name == 'is_family_member' %}
+                    <div class="form-check {% if field.errors %}has-error{% endif %}">
+                        {{ field }}
+                        <label for="{{ field.id_for_label }}" class="form-check-label">
+                            <i class="bi bi-people me-2"></i>{{ field.label }}
+                            <div class="help-text mt-2">Check this box if you are immediate family (spouse, parent, child, or sibling of an inmate)</div>
+                        </label>
+                        
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="text-danger mt-2">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Security Section with Password Visibility Toggle -->
+        <div class="form-section">
+            <h6><i class="bi bi-shield-lock me-2"></i>Account Security</h6>
+            
+            {% for field in form %}
+                {% if field.name in "password1,password2" %}
+                    <div class="mb-3 {% if field.errors %}has-error{% endif %}">
+                        <label for="{{ field.id_for_label }}" class="form-label required-field">
+                            {% if field.name == 'password1' %}<i class="bi bi-lock me-2"></i>
+                            {% elif field.name == 'password2' %}<i class="bi bi-shield-check me-2"></i>
+                            {% endif %}
+                            {{ field.label }}<span class="required">*</span>
+                        </label>
+                        
+                        <!-- 👁️ Password field with toggle button -->
+                        <div class="password-wrapper">
+                            {{ field }}
+                            <button type="button" class="password-toggle-btn" data-target="{{ field.id_for_label }}" onclick="togglePassword(this)">
+                                <i class="bi bi-eye" data-show-icon="bi-eye" data-hide-icon="bi-eye-slash"></i>
+                            </button>
+                        </div>
+                        
+                        {% if field.name == 'password1' %}
+                            <div class="help-text">Create a secure password (minimum 8 characters with letters and numbers)</div>
+                        {% elif field.name == 'password2' %}
+                            <div class="help-text">Confirm your password by entering it again</div>
+                        {% endif %}
+                        
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="text-danger mt-2">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 mt-4" id="submitBtn">
+            <i class="bi bi-check-circle me-2"></i>Submit Registration with Aadhar Card
+        </button>
+    </form>
+
+    <hr class="my-4">
+    
+    <div class="text-center">
+        <p class="text-muted mb-3">Already have an account?</p>
+        <a href="{% url 'visitor_login' %}" class="btn btn-outline-primary">
+            <i class="bi bi-box-arrow-in-right me-2"></i>Login Here
+        </a>
+    </div>
+
+    <div class="info-box mt-4">
+        <strong class="text-primary">Enhanced Registration Process:</strong>
+        <div class="help-text mt-2">
+            <strong>Step 1:</strong> Complete registration form with Aadhar card and profile photo<br>
+            <strong>Step 2:</strong> Aadhar verification and background security check (1-2 business days)<br>
+            <strong>Step 3:</strong> Identity verification using uploaded photos<br>
+            <strong>Step 4:</strong> Account activation notification sent to your email<br>
+            <strong>Step 5:</strong> Begin scheduling visits to approved prison facilities
+        </div>
+    </div>
+</div>
+
+<script>
+// 👁️ PASSWORD VISIBILITY TOGGLE FUNCTION
+function togglePassword(button) {
+    const targetId = button.getAttribute('data-target');
+    const passwordInput = document.getElementById(targetId);
+    const icon = button.querySelector('i');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+        button.setAttribute('title', 'Hide password');
+    } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+        button.setAttribute('title', 'Show password');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Enhanced form validation and styling
+    const form = document.getElementById('registrationForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Add proper form control classes
+    const inputs = form.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+        if (!input.classList.contains('form-control') && input.type !== 'checkbox') {
+            input.classList.add('form-control');
+        }
+        
+        // Add error state handling
+        if (input.closest('.has-error')) {
+            input.classList.add('is-invalid');
+        }
+        
+        // Real-time validation
+        input.addEventListener('blur', function() {
+            if (this.value.trim() && this.checkValidity()) {
+                this.closest('.mb-3, .form-check')?.classList.add('has-success');
+                this.closest('.mb-3, .form-check')?.classList.remove('has-error');
+            }
+        });
+    });
+
+    // Enhanced file size and type validation
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+    fileInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const file = this.files[0];
+            const fileName = this.name;
+            const uploadSection = this.closest('.image-upload-section');
+            
+            // Remove any existing file info
+            const existingInfo = uploadSection.querySelector('.file-info');
+            if (existingInfo) existingInfo.remove();
+            
+            if (file) {
+                // File size validation
+                const maxSize = fileName === 'profile_photo' ? 3 * 1024 * 1024 : 5 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    const maxSizeMB = fileName === 'profile_photo' ? '3MB' : '5MB';
+                    alert(`File size must be less than ${maxSizeMB}. Please choose a smaller file.`);
+                    this.value = '';
+                    return;
+                }
+                
+                // File type validation
+                if (!file.type.startsWith('image/')) {
+                    alert('Please upload an image file (JPEG, PNG, etc.).');
+                    this.value = '';
+                    return;
+                }
+                
+                // Show file info
+                const fileInfo = document.createElement('div');
+                fileInfo.className = 'file-info';
+                fileInfo.innerHTML = `<i class="bi bi-check-circle me-2"></i>Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                uploadSection.appendChild(fileInfo);
+                
+                // Mark as success
+                this.closest('.mb-3')?.classList.add('has-success');
+                this.closest('.mb-3')?.classList.remove('has-error');
+            }
+        });
+    });
+
+    // Enhanced Aadhar number formatting
+    const aadharInput = document.querySelector('input[name="aadhar_number"]');
+    if (aadharInput) {
+        aadharInput.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            
+            if (value.length > 12) {
+                value = value.substring(0, 12);
+            }
+            
+            // Format as XXXX XXXX XXXX
+            if (value.length > 8) {
+                value = value.substring(0, 4) + ' ' + value.substring(4, 8) + ' ' + value.substring(8);
+            } else if (value.length > 4) {
+                value = value.substring(0, 4) + ' ' + value.substring(4);
+            }
+            
+            this.value = value;
+            
+            // Real-time validation feedback
+            if (value.replace(/\s/g, '').length === 12) {
+                this.closest('.mb-3')?.classList.add('has-success');
+                this.closest('.mb-3')?.classList.remove('has-error');
+            }
+        });
+        
+        aadharInput.addEventListener('keypress', function(e) {
+            if (!/\d/.test(e.key) && !['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
+    }
+
+    // Phone number formatting
+    const phoneInput = document.querySelector('input[name="phone_number"]');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 10) {
+                value = value.substring(0, 10);
+            }
+            this.value = value;
+            
+            // Validation feedback
+            if (value.length === 10 && /^[6-9]/.test(value)) {
+                this.closest('.mb-3')?.classList.add('has-success');
+                this.closest('.mb-3')?.classList.remove('has-error');
+            }
+        });
+    }
+
+    // Form submission handling
+    form.addEventListener('submit', function(e) {
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Processing Registration...';
+        submitBtn.disabled = true;
+        submitBtn.classList.add('loading');
+        
+        // Re-enable after 15 seconds if still on page
+        setTimeout(() => {
+            submitBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Submit Registration with Aadhar Card';
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('loading');
+        }, 15000);
+    });
+
+    // Enhanced placeholder text
+    const placeholders = {
+        'username': 'Enter your username',
+        'email': 'your.email@example.com',
+        'full_name': 'Enter your full name as per Aadhar card',
+        'first_name': 'First name as per Aadhar',
+        'last_name': 'Last name as per Aadhar',
+        'phone_number': '9876543210',
+        'address': 'Enter your complete address as mentioned in Aadhar card',
+        'aadhar_number': 'Enter 12-digit Aadhar number',
+        'password1': 'Create a strong password',
+        'password2': 'Confirm your password'
+    };
+
+    Object.entries(placeholders).forEach(([name, placeholder]) => {
+        const input = document.querySelector(`input[name="${name}"], textarea[name="${name}"]`);
+        if (input) {
+            input.placeholder = placeholder;
+        }
+    });
+
+    // Add loading animation to inputs
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.classList.add('loading');
+            setTimeout(() => this.classList.remove('loading'), 500);
+        });
+    });
+    
+    // Add title tooltips to password toggle buttons
+    document.querySelectorAll('.password-toggle-btn').forEach(btn => {
+        btn.setAttribute('title', 'Show password');
+    });
+});
+</script>
+{% endblock %}

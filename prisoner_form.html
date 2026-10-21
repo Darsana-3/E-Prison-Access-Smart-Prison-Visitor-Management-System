@@ -1,0 +1,618 @@
+{% extends "base.html" %}
+{% block title %}Add New Prisoner{% endblock %}
+
+{% block content %}
+<style>
+/* Dark Prison Theme - Add New Prisoner */
+:root {
+    --bg-dark: #1a1a1a;
+    --bg-card: #2d2d2d;
+    --bg-input: #404040;
+    --bg-accent: #363636;
+    --border: #555;
+    --text-white: #ffffff;
+    --text-bright: #f8f9fa;
+    --text-light: #e9ecef;
+    --text-muted: #d1d5db;
+    --text-gray: #9ca3af;
+    --primary: #0066cc;
+    --success: #28a745;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --info: #17a2b8;
+}
+
+body {
+    background: var(--bg-dark) !important;
+    color: var(--text-white) !important;
+}
+
+/* Page Header */
+.page-header {
+    background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-accent) 100%);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-top: 4px solid var(--success);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.page-header h2 {
+    color: var(--text-white) !important;
+    font-weight: 700 !important;
+    margin-bottom: 0 !important;
+    font-size: 1.6rem !important;
+}
+
+.btn-back {
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    color: var(--text-white) !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 8px !important;
+}
+
+.btn-back:hover {
+    background: var(--border) !important;
+    color: var(--text-white) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Form Card */
+.form-card {
+    background: var(--bg-card) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4) !important;
+    overflow: hidden;
+}
+
+.form-card .card-body {
+    background: transparent !important;
+    color: var(--text-white) !important;
+    padding: 2.5rem !important;
+}
+
+/* Form Section Headers */
+.form-section {
+    background: var(--bg-input) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    padding: 1.5rem !important;
+    margin-bottom: 2rem !important;
+    border-left: 4px solid var(--success) !important;
+}
+
+.form-section h5 {
+    color: var(--text-white) !important;
+    font-weight: 600 !important;
+    margin-bottom: 1rem !important;
+    font-size: 1.1rem !important;
+}
+
+.form-section-subtitle {
+    color: var(--text-muted) !important;
+    font-size: 0.9rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+/* Enhanced Form Labels */
+.form-label {
+    color: var(--text-white) !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.75rem !important;
+    font-size: 0.95rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    display: block !important;
+}
+
+.form-label.required::after {
+    content: ' *';
+    color: var(--danger) !important;
+    font-weight: bold !important;
+}
+
+/* Enhanced Form Controls */
+.form-control {
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    color: var(--text-white) !important;
+    padding: 0.875rem 1rem !important;
+    border-radius: 8px !important;
+    font-size: 1rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.form-control:focus {
+    background: var(--bg-input) !important;
+    border-color: var(--success) !important;
+    color: var(--text-white) !important;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+    outline: none !important;
+}
+
+.form-control::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 0.8 !important;
+}
+
+/* File Input Special Styling */
+.form-control[type="file"] {
+    padding: 0.75rem !important;
+    background: var(--bg-input) !important;
+    border: 2px dashed var(--border) !important;
+    transition: all 0.3s ease !important;
+}
+
+.form-control[type="file"]:hover {
+    border-color: var(--success) !important;
+    background: rgba(40, 167, 69, 0.05) !important;
+}
+
+.form-control[type="file"]::-webkit-file-upload-button {
+    background: var(--success) !important;
+    color: white !important;
+    border: none !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 4px !important;
+    margin-right: 1rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    font-size: 0.8rem !important;
+}
+
+/* Help Text */
+.form-text,
+small.text-muted {
+    color: var(--text-muted) !important;
+    font-size: 0.85rem !important;
+    margin-top: 0.5rem !important;
+    display: block !important;
+    font-weight: 500 !important;
+}
+
+/* Submit Button */
+.btn-submit {
+    background: linear-gradient(135deg, var(--success) 0%, #218838 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 700 !important;
+    padding: 1rem 2rem !important;
+    border-radius: 8px !important;
+    font-size: 1.1rem !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3) !important;
+}
+
+.btn-submit:hover {
+    background: linear-gradient(135deg, #218838 0%, var(--success) 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4) !important;
+    color: white !important;
+}
+
+/* Form Grid Enhancement */
+.form-grid {
+    display: grid;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+/* Input Icons */
+.input-icon {
+    position: relative;
+}
+
+.input-icon i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    z-index: 2;
+}
+
+.input-icon .form-control {
+    padding-left: 3rem !important;
+}
+
+/* Validation Styling */
+.form-control.is-valid {
+    border-color: var(--success) !important;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+}
+
+.form-control.is-invalid {
+    border-color: var(--danger) !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.valid-feedback {
+    color: var(--success) !important;
+    font-weight: 500 !important;
+}
+
+.invalid-feedback {
+    color: var(--danger) !important;
+    font-weight: 500 !important;
+}
+
+/* Security Notice */
+.security-notice {
+    background: rgba(23, 162, 184, 0.1) !important;
+    border: 2px solid var(--info) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin-bottom: 2rem !important;
+    color: var(--info) !important;
+}
+
+.security-notice strong {
+    color: var(--text-white) !important;
+}
+
+/* HR Styling */
+hr {
+    border-color: var(--border) !important;
+    opacity: 1 !important;
+    margin: 2rem 0 !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .page-header h2 {
+        font-size: 1.3rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .btn-back {
+        width: 100% !important;
+        margin-top: 1rem !important;
+    }
+    
+    .form-card .card-body {
+        padding: 1.5rem !important;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .form-section {
+        padding: 1rem !important;
+    }
+    
+    .btn-submit {
+        font-size: 1rem !important;
+        padding: 0.875rem 1.5rem !important;
+    }
+}
+
+/* Loading Animation */
+.form-loading {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<!-- Page Header -->
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <h2><i class="bi bi-person-plus-fill me-2"></i>ADD NEW PRISONER RECORD</h2>
+        <a href="{% url 'prisoner_list' %}" class="btn btn-back">
+            <i class="bi bi-arrow-left me-2"></i>Back to List
+        </a>
+    </div>
+</div>
+
+<!-- Security Notice -->
+<div class="security-notice">
+    <i class="bi bi-shield-check me-2"></i>
+    <strong>Security Notice:</strong> All prisoner information is confidential and must be handled according to facility protocols. Ensure all data entered is accurate and verified.
+</div>
+
+<!-- Form Container -->
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card form-card form-loading">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Personal Information Section -->
+                    <div class="form-section">
+                        <h5><i class="bi bi-person-vcard me-2"></i>Personal Information</h5>
+                        <p class="form-section-subtitle">Enter the prisoner's basic identifying information</p>
+                        
+                        <div class="form-row">
+                            <div class="input-icon">
+                                <i class="bi bi-person"></i>
+                                <label for="first_name" class="form-label required">First Name</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="first_name" 
+                                       name="first_name" 
+                                       placeholder="Enter first name"
+                                       required>
+                                <div class="invalid-feedback">Please provide a valid first name.</div>
+                            </div>
+                            
+                            <div class="input-icon">
+                                <i class="bi bi-person"></i>
+                                <label for="last_name" class="form-label required">Last Name</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="last_name" 
+                                       name="last_name" 
+                                       placeholder="Enter last name"
+                                       required>
+                                <div class="invalid-feedback">Please provide a valid last name.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="input-icon">
+                                <i class="bi bi-hash"></i>
+                                <label for="prisoner_id" class="form-label required">Prisoner ID</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="prisoner_id" 
+                                       name="prisoner_id" 
+                                       placeholder="Enter unique prisoner ID"
+                                       style="font-family: 'Courier New', monospace; letter-spacing: 1px;"
+                                       required>
+                                <small class="form-text">Must be unique within the facility system</small>
+                                <div class="invalid-feedback">Please provide a valid prisoner ID.</div>
+                            </div>
+                            
+                            <div class="input-icon">
+                                <i class="bi bi-calendar3"></i>
+                                <label for="date_of_birth" class="form-label required">Date of Birth</label>
+                                <input type="date" 
+                                       class="form-control" 
+                                       id="date_of_birth" 
+                                       name="date_of_birth" 
+                                       required>
+                                <div class="invalid-feedback">Please provide a valid date of birth.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Photo Upload Section -->
+                    <div class="form-section">
+                        <h5><i class="bi bi-camera-fill me-2"></i>Prisoner Photo</h5>
+                        <p class="form-section-subtitle">Upload a clear identification photo</p>
+                        
+                        <div>
+                            <label for="photo" class="form-label">Photo Upload</label>
+                            <input type="file" 
+                                   class="form-control" 
+                                   id="photo" 
+                                   name="photo"
+                                   accept="image/jpeg,image/png,image/jpg">
+                            <small class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Optional. Upload a clear, recent photo (JPEG/PNG format, max 5MB). This will be used for identification purposes.
+                            </small>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Submit Button -->
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-submit w-100" id="submitBtn">
+                            <i class="bi bi-save me-2"></i>Save Prisoner Record
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form loading animation
+    const form = document.querySelector('.form-loading');
+    setTimeout(() => {
+        form.style.opacity = '1';
+    }, 100);
+
+    // Form validation
+    const formElement = document.querySelector('form');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Real-time validation
+    const inputs = document.querySelectorAll('.form-control[required]');
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            validateField(this);
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid')) {
+                validateField(this);
+            }
+        });
+    });
+
+    // Form submission
+    formElement.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Validate all required fields
+        inputs.forEach(input => {
+            if (!validateField(input)) {
+                isValid = false;
+            }
+        });
+        
+        // Validate prisoner ID uniqueness (basic client-side check)
+        const prisonerIdInput = document.getElementById('prisoner_id');
+        if (prisonerIdInput.value.length < 3) {
+            prisonerIdInput.classList.add('is-invalid');
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please correct the errors in the form before submitting.');
+            return false;
+        }
+        
+        // Show loading state
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Saving Record...';
+        submitBtn.disabled = true;
+        
+        // Re-enable after timeout (in case of errors)
+        setTimeout(() => {
+            submitBtn.innerHTML = '<i class="bi bi-save me-2"></i>Save Prisoner Record';
+            submitBtn.disabled = false;
+        }, 10000);
+    });
+
+    // File upload validation
+    const photoInput = document.getElementById('photo');
+    photoInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            // Check file size (5MB limit)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Photo file size must be less than 5MB. Please choose a smaller file.');
+                this.value = '';
+                return;
+            }
+            
+            // Check file type
+            if (!file.type.match(/^image\/(jpeg|jpg|png)$/)) {
+                alert('Please upload a valid image file (JPEG or PNG format only).');
+                this.value = '';
+                return;
+            }
+            
+            // Show success message
+            this.classList.add('is-valid');
+        }
+    });
+
+    // Prisoner ID formatting
+    const prisonerIdInput = document.getElementById('prisoner_id');
+    prisonerIdInput.addEventListener('input', function() {
+        // Convert to uppercase and remove invalid characters
+        this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    });
+
+    // Auto-calculate age from date of birth
+    const dobInput = document.getElementById('date_of_birth');
+    dobInput.addEventListener('change', function() {
+        if (this.value) {
+            const birthDate = new Date(this.value);
+            const today = new Date();
+            const age = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
+            
+            if (age < 0) {
+                alert('Date of birth cannot be in the future.');
+                this.value = '';
+                this.classList.add('is-invalid');
+            } else if (age > 120) {
+                alert('Please verify the date of birth. Age calculated seems unusually high.');
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.add('is-valid');
+                // You could show age here if needed
+                console.log(`Calculated age: ${age} years`);
+            }
+        }
+    });
+});
+
+// Field validation function
+function validateField(field) {
+    const value = field.value.trim();
+    let isValid = true;
+    
+    // Remove existing validation classes
+    field.classList.remove('is-valid', 'is-invalid');
+    
+    // Check if required field is empty
+    if (field.required && !value) {
+        field.classList.add('is-invalid');
+        isValid = false;
+    } else if (value) {
+        // Field-specific validation
+        switch(field.name) {
+            case 'first_name':
+            case 'last_name':
+                if (value.length < 2 || !/^[a-zA-Z\s]+$/.test(value)) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.add('is-valid');
+                }
+                break;
+                
+            case 'prisoner_id':
+                if (value.length < 3 || !/^[A-Z0-9]+$/.test(value)) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.add('is-valid');
+                }
+                break;
+                
+            case 'date_of_birth':
+                const birthDate = new Date(value);
+                const today = new Date();
+                const age = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
+                
+                if (age < 0 || age > 120) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.add('is-valid');
+                }
+                break;
+                
+            default:
+                field.classList.add('is-valid');
+        }
+    }
+    
+    return isValid;
+}
+
+// Prevent double submission
+let isSubmitting = false;
+document.addEventListener('submit', function(e) {
+    if (isSubmitting) {
+        e.preventDefault();
+        return false;
+    }
+    isSubmitting = true;
+});
+</script>
+{% endblock %}

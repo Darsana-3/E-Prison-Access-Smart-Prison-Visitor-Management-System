@@ -1,0 +1,713 @@
+{% extends "base.html" %}
+{% block title %}Emergency Alert Management{% endblock %}
+
+{% block content %}
+<style>
+/* Dark Prison Theme - Emergency Alert Management */
+:root {
+    --bg-dark: #1a1a1a;
+    --bg-card: #2d2d2d;
+    --bg-input: #404040;
+    --bg-accent: #363636;
+    --bg-table-row: #333333;
+    --border: #555;
+    --text-white: #ffffff;
+    --text-bright: #f8f9fa;
+    --text-light: #e9ecef;
+    --text-muted: #d1d5db;
+    --text-gray: #9ca3af;
+    --name-black: #000000;
+    --primary: #0066cc;
+    --success: #28a745;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --info: #17a2b8;
+}
+
+body {
+    background: var(--bg-dark) !important;
+    color: var(--text-white) !important;
+}
+
+/* Page Header */
+.page-header {
+    background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-accent) 100%);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-top: 4px solid var(--danger);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.page-header h2 {
+    color: var(--text-white) !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 1.6rem !important;
+}
+
+.page-subtitle {
+    color: var(--text-light) !important;
+    font-size: 0.95rem !important;
+    margin-bottom: 0 !important;
+    opacity: 0.9;
+}
+
+/* Emergency Warning */
+.emergency-warning {
+    background: rgba(220, 53, 69, 0.1) !important;
+    border: 2px solid var(--danger) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin-bottom: 2rem !important;
+    color: var(--danger) !important;
+}
+
+.emergency-warning strong {
+    color: var(--text-white) !important;
+}
+
+/* Broadcast Alert Card */
+.broadcast-alert-card {
+    background: var(--bg-card) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4) !important;
+    overflow: hidden;
+}
+
+.broadcast-alert-card .card-header {
+    background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%) !important;
+    border-bottom: 2px solid var(--border) !important;
+    color: white !important;
+    padding: 1.5rem !important;
+}
+
+.broadcast-alert-card .card-header h4 {
+    color: white !important;
+    font-weight: 700 !important;
+    margin-bottom: 0 !important;
+    font-size: 1.2rem !important;
+}
+
+.broadcast-alert-card .card-body {
+    background: transparent !important;
+    color: var(--text-white) !important;
+    padding: 2rem !important;
+}
+
+.broadcast-description {
+    color: var(--text-muted) !important;
+    font-size: 0.9rem !important;
+    margin-bottom: 2rem !important;
+    padding: 1rem !important;
+    background: var(--bg-input) !important;
+    border-radius: 6px !important;
+    border-left: 4px solid var(--danger) !important;
+}
+
+/* Enhanced Form Labels and Inputs */
+.form-label {
+    color: var(--text-white) !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.75rem !important;
+    font-size: 0.95rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    display: block !important;
+}
+
+.form-control {
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    color: var(--text-white) !important;
+    padding: 0.875rem 1rem !important;
+    border-radius: 8px !important;
+    font-size: 1rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.form-control:focus {
+    background: var(--bg-input) !important;
+    border-color: var(--danger) !important;
+    color: var(--text-white) !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    outline: none !important;
+}
+
+.form-control::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 0.8 !important;
+}
+
+/* Textarea Special Styling */
+textarea.form-control {
+    min-height: 120px !important;
+    resize: vertical !important;
+    line-height: 1.4 !important;
+}
+
+/* Broadcast Button */
+.btn-broadcast {
+    background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 700 !important;
+    padding: 1rem 2rem !important;
+    border-radius: 8px !important;
+    font-size: 1rem !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 3px 8px rgba(220, 53, 69, 0.3) !important;
+}
+
+.btn-broadcast:hover {
+    background: linear-gradient(135deg, #c82333 0%, var(--danger) 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 12px rgba(220, 53, 69, 0.4) !important;
+    color: white !important;
+}
+
+/* Alert History Card */
+.alert-history-card {
+    background: var(--bg-card) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4) !important;
+    overflow: hidden;
+}
+
+.alert-history-card .card-body {
+    background: transparent !important;
+    color: var(--text-white) !important;
+    padding: 0 !important;
+}
+
+.alert-history-header {
+    background: var(--bg-input) !important;
+    border-bottom: 2px solid var(--border) !important;
+    padding: 1.5rem !important;
+}
+
+.alert-history-header h4 {
+    color: var(--text-white) !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 1.3rem !important;
+}
+
+.alert-count {
+    color: var(--danger) !important;
+    font-weight: 600 !important;
+    background: rgba(220, 53, 69, 0.1) !important;
+    padding: 0.3rem 0.8rem !important;
+    border-radius: 15px !important;
+    font-size: 0.85rem !important;
+    display: inline-block !important;
+    margin-top: 0.5rem !important;
+}
+
+/* Enhanced Table Styling */
+.table {
+    color: var(--text-white) !important;
+    margin-bottom: 0 !important;
+    background: transparent !important;
+}
+
+.table thead th {
+    background: var(--bg-input) !important;
+    color: var(--text-bright) !important;
+    border-bottom: 2px solid var(--border) !important;
+    border-top: none !important;
+    padding: 1.25rem !important;
+    font-weight: 700 !important;
+    font-size: 0.9rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.table tbody tr {
+    background: var(--bg-card) !important;
+    border-bottom: 1px solid var(--border) !important;
+    transition: all 0.3s ease !important;
+}
+
+.table tbody tr:hover {
+    background: var(--bg-table-row) !important;
+    transform: translateX(3px) !important;
+    box-shadow: inset 4px 0 0 var(--danger) !important;
+}
+
+.table tbody td {
+    color: var(--text-bright) !important;
+    border-top: 1px solid var(--border) !important;
+    padding: 1.25rem !important;
+    vertical-align: middle !important;
+}
+
+/* Alert Messages */
+.alert-message {
+    color: var(--text-white) !important;
+    font-weight: 500 !important;
+    font-size: 0.95rem !important;
+    background: var(--bg-input) !important;
+    padding: 0.75rem !important;
+    border-radius: 6px !important;
+    border-left: 4px solid var(--danger) !important;
+    line-height: 1.4 !important;
+    max-width: 400px !important;
+    word-wrap: break-word !important;
+}
+
+/* Status Badges */
+.status-active {
+    background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 15px !important;
+    font-size: 0.85rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    animation: pulse-active 2s infinite !important;
+}
+
+.status-inactive {
+    background: var(--bg-accent) !important;
+    color: var(--text-muted) !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 15px !important;
+    font-size: 0.85rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+@keyframes pulse-active {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+/* Action Buttons */
+.btn-deactivate {
+    background: linear-gradient(135deg, var(--success) 0%, #218838 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 6px !important;
+    font-size: 0.85rem !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.3px !important;
+}
+
+.btn-deactivate:hover {
+    background: linear-gradient(135deg, #218838 0%, var(--success) 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 3px 8px rgba(40, 167, 69, 0.3) !important;
+    color: white !important;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center !important;
+    padding: 4rem 2rem !important;
+    background: var(--bg-input) !important;
+    border-radius: 8px !important;
+    margin: 2rem !important;
+}
+
+.empty-state i {
+    color: var(--text-gray) !important;
+    font-size: 4rem !important;
+    margin-bottom: 1rem !important;
+}
+
+.empty-state h5 {
+    color: var(--text-white) !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.empty-state p {
+    color: var(--text-muted) !important;
+    margin-bottom: 0 !important;
+}
+
+/* Statistics Bar */
+.stats-bar {
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin-bottom: 1.5rem !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.stat-item {
+    text-align: center !important;
+}
+
+.stat-number {
+    color: var(--text-bright) !important;
+    font-size: 1.5rem !important;
+    font-weight: 800 !important;
+    display: block !important;
+}
+
+.stat-label {
+    color: var(--text-muted) !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Active Alert Banner Style */
+.current-alert-banner {
+    background: linear-gradient(90deg, var(--danger) 0%, #ff0000 50%, var(--danger) 100%) !important;
+    color: white !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin-bottom: 1.5rem !important;
+    text-align: center !important;
+    font-weight: 700 !important;
+    animation: flash-warning 1.5s infinite !important;
+}
+
+@keyframes flash-warning {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .page-header h2 {
+        font-size: 1.3rem !important;
+    }
+    
+    .broadcast-alert-card .card-body {
+        padding: 1.5rem !important;
+    }
+    
+    .alert-history-header {
+        padding: 1rem !important;
+        text-align: center;
+    }
+    
+    .table {
+        font-size: 0.85rem;
+    }
+    
+    .table thead th,
+    .table tbody td {
+        padding: 0.75rem 0.5rem !important;
+    }
+    
+    .alert-message {
+        max-width: none !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .stats-bar {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+/* Loading Animation */
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<!-- Page Header -->
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2><i class="bi bi-broadcast me-2"></i>EMERGENCY ALERT SYSTEM</h2>
+            <p class="page-subtitle">Manage facility-wide emergency communications and notifications</p>
+        </div>
+        <a href="{% url 'security_dashboard' %}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Emergency Warning -->
+<div class="emergency-warning">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <strong>Administrative Notice:</strong> Emergency alerts are broadcast immediately to all logged-in staff members. Use this system responsibly and only for genuine facility emergencies requiring immediate staff attention.
+</div>
+
+<!-- Current Active Alert (if any) -->
+{% if active_alert %}
+<div class="current-alert-banner">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <strong>CURRENTLY ACTIVE ALERT:</strong> {{ active_alert.message }}
+    <div class="mt-2">
+        <small>Issued: {{ active_alert.issued_at|date:"M d, Y H:i" }} by {{ active_alert.issued_by.get_full_name|default:active_alert.issued_by.username }}</small>
+    </div>
+</div>
+{% endif %}
+
+<!-- Statistics Bar -->
+<div class="stats-bar">
+    <div class="stat-item">
+        <span class="stat-number">{{ alert_history|length }}</span>
+        <div class="stat-label">Total Alerts</div>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">{% if active_alert %}1{% else %}0{% endif %}</span>
+        <div class="stat-label">Active Alerts</div>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">{{ alert_history|length|add:"-1"|default:"0" }}</span>
+        <div class="stat-label">Resolved Alerts</div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Broadcast New Alert Form Column -->
+    <div class="col-lg-4">
+        <div class="card broadcast-alert-card fade-in">
+            <div class="card-header">
+                <h4><i class="bi bi-broadcast me-2"></i>BROADCAST NEW ALERT</h4>
+            </div>
+            <div class="card-body">
+                <div class="broadcast-description">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Immediate Broadcast:</strong> Your message will display as a banner to all logged-in staff members throughout the facility.
+                </div>
+                
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label for="message" class="form-label">
+                            <i class="bi bi-megaphone me-2"></i>Alert Message
+                        </label>
+                        <textarea name="message" 
+                                  id="message" 
+                                  class="form-control" 
+                                  rows="4" 
+                                  placeholder="Example: LOCKDOWN IN EFFECT. ALL STAFF REPORT TO STATIONS IMMEDIATELY. SECURITY PROTOCOL ALPHA IS NOW ACTIVE."
+                                  required></textarea>
+                        <div class="form-text mt-2">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Use clear, concise language. Include specific instructions for staff response.
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-broadcast w-100" id="broadcastBtn">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Broadcast Alert
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert History Column -->
+    <div class="col-lg-8">
+        <div class="card alert-history-card fade-in">
+            <div class="alert-history-header">
+                <h4><i class="bi bi-clock-history me-2"></i>Alert History & Management</h4>
+                <div class="alert-count">
+                    <i class="bi bi-broadcast me-1"></i>
+                    {{ alert_history|length }} Alert{{ alert_history|length|pluralize }} Total
+                </div>
+            </div>
+            
+            <div class="card-body">
+                {% if alert_history %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th><i class="bi bi-megaphone me-2"></i>Alert Message</th>
+                                <th><i class="bi bi-person me-2"></i>Issued By</th>
+                                <th><i class="bi bi-clock me-2"></i>Time</th>
+                                <th><i class="bi bi-activity me-2"></i>Status</th>
+                                <th class="text-end"><i class="bi bi-gear me-2"></i>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alert in alert_history %}
+                            <tr>
+                                <td>
+                                    <div class="alert-message">
+                                        {{ alert.message|truncatewords:20 }}
+                                        {% if alert.message|length > 100 %}
+                                            <small class="text-muted d-block mt-1">
+                                                <i class="bi bi-three-dots me-1"></i>{{ alert.message|length }} characters total
+                                            </small>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <strong>{{ alert.issued_by.get_full_name|default:alert.issued_by.username }}</strong>
+                                    <small class="text-muted d-block">{{ alert.issued_by.username }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">
+                                        <i class="bi bi-clock me-1"></i>{{ alert.issued_at|time:"H:i" }}
+                                    </span>
+                                    <small class="text-muted d-block">{{ alert.issued_at|date:"M d, Y" }}</small>
+                                </td>
+                                <td>
+                                    {% if alert.is_active %}
+                                        <span class="badge status-active">
+                                            <i class="bi bi-broadcast me-1"></i>Active
+                                        </span>
+                                    {% else %}
+                                        <span class="badge status-inactive">
+                                            <i class="bi bi-check-circle me-1"></i>Resolved
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    {% if alert.is_active %}
+                                        <a href="{% url 'deactivate_alert' alert.pk %}" 
+                                           class="btn btn-deactivate"
+                                           onclick="return confirm('Are you sure you want to deactivate this emergency alert? It will no longer be visible to staff members.')">
+                                            <i class="bi bi-stop-circle me-1"></i>Deactivate
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted small">
+                                            <i class="bi bi-check me-1"></i>Resolved
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <!-- Empty State -->
+                <div class="empty-state">
+                    <i class="bi bi-broadcast"></i>
+                    <h5>No Emergency Alerts</h5>
+                    <p>No emergency alerts have been broadcast yet. Use the form on the left to send facility-wide emergency notifications.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add fade-in animation
+    const fadeElements = document.querySelectorAll('.fade-in');
+    fadeElements.forEach((element, index) => {
+        setTimeout(() => {
+            element.style.opacity = '1';
+        }, index * 200);
+    });
+
+    // Form validation and submission
+    const form = document.querySelector('form');
+    const broadcastBtn = document.getElementById('broadcastBtn');
+    const messageTextarea = document.getElementById('message');
+    
+    if (form && broadcastBtn && messageTextarea) {
+        form.addEventListener('submit', function(e) {
+            const message = messageTextarea.value.trim();
+            
+            // Basic validation
+            if (!message || message.length < 10) {
+                e.preventDefault();
+                alert('Please provide a detailed emergency message (minimum 10 characters).');
+                messageTextarea.focus();
+                return false;
+            }
+            
+            // Confirmation dialog
+            if (!confirm('🚨 EMERGENCY ALERT CONFIRMATION 🚨\n\nAre you sure you want to broadcast this emergency alert to all staff?\n\n"' + message + '"\n\nThis will immediately notify all logged-in personnel.')) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Show loading state
+            broadcastBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Broadcasting...';
+            broadcastBtn.disabled = true;
+            
+            // Re-enable after timeout (in case of errors)
+            setTimeout(() => {
+                broadcastBtn.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>Broadcast Alert';
+                broadcastBtn.disabled = false;
+            }, 8000);
+        });
+        
+        // Character counter for textarea
+        messageTextarea.addEventListener('input', function() {
+            const length = this.value.length;
+            const formText = this.parentNode.querySelector('.form-text');
+            
+            if (length > 0) {
+                formText.innerHTML = `<i class="bi bi-info-circle me-1"></i>Characters: ${length} | Use clear, actionable language for emergency response.`;
+            } else {
+                formText.innerHTML = '<i class="bi bi-info-circle me-1"></i>Use clear, concise language. Include specific instructions for staff response.';
+            }
+        });
+    }
+
+    // Deactivate button animations
+    const deactivateButtons = document.querySelectorAll('.btn-deactivate');
+    deactivateButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const confirmed = confirm('Are you sure you want to deactivate this emergency alert?');
+            if (confirmed) {
+                this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Deactivating...';
+                this.disabled = true;
+            } else {
+                e.preventDefault();
+            }
+        });
+    });
+
+    // Enhanced row hover effects for alert history
+    const tableRows = document.querySelectorAll('tbody tr');
+    tableRows.forEach((row, index) => {
+        // Stagger animation
+        row.style.animationDelay = `${index * 0.1}s`;
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.borderLeft = '4px solid var(--danger)';
+            this.style.paddingLeft = '12px';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.borderLeft = 'none';
+            this.style.paddingLeft = '16px';
+        });
+    });
+
+    // Auto-refresh active alert status every 30 seconds
+    setInterval(() => {
+        const activeAlert = document.querySelector('.current-alert-banner');
+        if (activeAlert) {
+            console.log('Active emergency alert detected - maintaining alert status');
+        }
+    }, 30000);
+});
+</script>
+{% endblock %}

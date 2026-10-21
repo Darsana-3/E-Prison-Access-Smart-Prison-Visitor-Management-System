@@ -1,0 +1,993 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Profile{% endblock %}
+{% block page_title %}User Profile{% endblock %}
+
+{% block extra_head %}
+<style>
+:root {
+    --bg-dark: #0f1419;
+    --bg-card: #1e1e1e;
+    --bg-section: #252d38;
+    --bg-accent: #2a323d;
+    --border: #404040;
+    --border-light: #52606d;
+    --text-white: #ffffff;
+    --text-muted: #ffffff;
+    --text-gray: #ffffff;
+    --primary: #0066cc;
+    --primary-light: #3d8bfd;
+    --success: #28a745;
+    --warning: #ffc107;
+    --warning-dark: #e0a800;
+    --danger: #dc3545;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.15);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.25);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
+    --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    --gradient-success: linear-gradient(135deg, var(--success) 0%, #20c997 100%);
+    --gradient-warning: linear-gradient(135deg, var(--warning) 0%, var(--warning-dark) 100%);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* FORCE ALL TEXT TO BE WHITE */
+*, *::before, *::after,
+body, body *,
+.container-fluid, .container-fluid *,
+.profile-container, .profile-container *,
+.profile-header, .profile-header *,
+.profile-info, .profile-info *,
+.info-grid, .info-grid *,
+.info-section, .info-section *,
+.info-section-header, .info-section-header *,
+.info-section-body, .info-section-body *,
+.info-item, .info-item *,
+.info-label, .info-label *,
+.info-value, .info-value *,
+.family-section, .family-section *,
+.family-member-card, .family-member-card *,
+h1, h2, h3, h4, h5, h6,
+p, span, div, label, a {
+    color: #ffffff !important;
+}
+
+body {
+    background: var(--bg-dark) !important;
+    color: #ffffff !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Enhanced Profile Container with Gradient Header */
+.profile-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+}
+
+.profile-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-primary);
+}
+
+/* Modern Profile Header */
+.profile-header {
+    background: linear-gradient(135deg, var(--bg-section) 0%, var(--bg-accent) 100%);
+    padding: 3rem 2rem 2rem 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(0, 102, 204, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.profile-header-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    position: relative;
+    z-index: 2;
+}
+
+/* Enhanced Profile Photo */
+.profile-photo-wrapper {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.profile-photo {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid rgba(0, 102, 204, 0.3);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+}
+
+.profile-photo:hover {
+    border-color: var(--primary);
+    transform: scale(1.02);
+}
+
+.profile-photo-placeholder {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 700;
+    color: white !important;
+    box-shadow: var(--shadow-md);
+}
+
+.photo-status-indicator {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    background: var(--success);
+    border-radius: 50%;
+    border: 3px solid var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Enhanced Profile Info */
+.profile-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.profile-name {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #ffffff !important;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.profile-role {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0, 102, 204, 0.15);
+    color: var(--primary-light) !important;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(0, 102, 204, 0.2);
+}
+
+.profile-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.profile-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: var(--transition);
+}
+
+.profile-detail-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.profile-detail-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--primary-light) !important;
+    flex-shrink: 0;
+}
+
+.profile-detail-text {
+    color: #ffffff !important;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* Enhanced Badge System */
+.profile-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.profile-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: var(--transition);
+    border: 1px solid;
+}
+
+.badge-family {
+    background: var(--gradient-success);
+    border-color: var(--success);
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.badge-authorizer {
+    background: var(--gradient-warning);
+    border-color: var(--warning);
+    color: #1a1a1a !important;
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+
+.profile-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Action Buttons */
+.profile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-end;
+    flex-shrink: 0;
+}
+
+.profile-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    min-width: 160px;
+    justify-content: center;
+    color: white !important;
+}
+
+.btn-edit-profile {
+    background: var(--gradient-primary);
+    color: white !important;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-edit-profile:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    color: white !important;
+}
+
+.btn-family-settings {
+    background: var(--gradient-success);
+    color: white !important;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-family-settings:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    color: white !important;
+}
+
+/* Enhanced Information Grid */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    padding: 2rem;
+    background: var(--bg-card);
+}
+
+/* Modern Info Sections */
+.info-section {
+    background: linear-gradient(135deg, var(--bg-section) 0%, var(--bg-accent) 100%);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 0;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.info-section:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
+}
+
+.info-section-header {
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    background: linear-gradient(135deg, rgba(0, 102, 204, 0.1) 0%, rgba(0, 102, 204, 0.05) 100%);
+    border-bottom: 1px solid rgba(0, 102, 204, 0.2);
+}
+
+.info-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #ffffff !important;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-section-body {
+    padding: 1.5rem;
+}
+
+/* Enhanced Info Items */
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: var(--transition);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.info-item:hover {
+    background: rgba(255, 255, 255, 0.02);
+    margin: 0 -1.5rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    border-radius: var(--radius-sm);
+}
+
+.info-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #ffffff !important;
+    font-size: 0.95rem;
+}
+
+.info-value {
+    color: #ffffff !important;
+    font-weight: 500;
+    text-align: right;
+    max-width: 200px;
+    word-break: break-word;
+}
+
+/* Status Indicators */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--radius-lg);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.status-success {
+    background: rgba(40, 167, 69, 0.15);
+    color: #ffffff !important;
+    border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.status-warning {
+    background: rgba(255, 193, 7, 0.15);
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.status-indicator::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+/* Enhanced Family Section */
+.family-section {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, var(--bg-section) 0%, var(--bg-accent) 100%);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.family-section-header {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.05) 100%);
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+.family-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #ffffff !important;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.family-members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem;
+}
+
+.family-member-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.family-member-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--gradient-success);
+}
+
+.family-member-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(40, 167, 69, 0.3);
+}
+
+.family-member-name {
+    color: #ffffff !important;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.family-member-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.family-member-detail {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #ffffff !important;
+    font-size: 0.9rem;
+}
+
+.family-connection-indicator {
+    width: 8px;
+    height: 8px;
+    background: var(--success);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Button styles */
+.btn {
+    color: white !important;
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-outline-primary {
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary) !important;
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary);
+    color: white !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .profile-header {
+        padding: 2rem 1.5rem;
+    }
+    
+    .profile-header-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    
+    .profile-name {
+        font-size: 1.8rem;
+    }
+    
+    .profile-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-actions {
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+    }
+    
+    .profile-action-btn {
+        flex: 1;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+        padding: 1.5rem;
+        gap: 1.5rem;
+    }
+    
+    .family-members-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-photo,
+    .profile-photo-placeholder {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .profile-photo-placeholder {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-header {
+        padding: 1.5rem 1rem;
+    }
+    
+    .info-grid {
+        padding: 1rem;
+    }
+    
+    .info-section-header,
+    .info-section-body {
+        padding: 1rem;
+    }
+    
+    .family-members-grid {
+        padding: 1rem;
+        gap: 1rem;
+    }
+    
+    .family-member-card {
+        padding: 1rem;
+    }
+}
+
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .info-section {
+        border-width: 2px;
+    }
+    
+    .profile-badge {
+        border-width: 2px;
+    }
+    
+    .status-indicator {
+        border-width: 2px;
+    }
+}
+
+/* Additional white text overrides for specific elements */
+h6 {
+    color: #ffffff !important;
+}
+
+.family-section h6 {
+    color: #ffffff !important;
+}
+
+p {
+    color: #ffffff !important;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Enhanced Profile Container -->
+    <div class="profile-container">
+        <!-- Modern Profile Header -->
+        <div class="profile-header">
+            <div class="profile-header-content">
+                <!-- Enhanced Profile Photo -->
+                <div class="profile-photo-wrapper">
+                    {% if user.profile_photo %}
+                        <img src="{{ user.profile_photo.url }}" class="profile-photo" alt="Profile Photo">
+                    {% else %}
+                        <div class="profile-photo-placeholder">
+                            {{ user.full_name|default:user.username|first|upper }}
+                        </div>
+                    {% endif %}
+                    <div class="photo-status-indicator">
+                        <i class="bi bi-check" style="font-size: 0.7rem; color: white;"></i>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Profile Info -->
+                <div class="profile-info">
+                    <h1 class="profile-name">{{ user.full_name|default:user.username }}</h1>
+                    
+                    <div class="profile-role">
+                        <i class="bi bi-person-badge"></i>
+                        {{ user.get_role_display }}
+                    </div>
+                    
+                    <!-- Profile Details Grid -->
+                    <div class="profile-details">
+                        <div class="profile-detail-item">
+                            <i class="bi bi-envelope profile-detail-icon"></i>
+                            <span class="profile-detail-text">{{ user.email|default:"No email provided" }}</span>
+                        </div>
+                        <div class="profile-detail-item">
+                            <i class="bi bi-telephone profile-detail-icon"></i>
+                            <span class="profile-detail-text">{{ user.phone_number|default:"No phone provided" }}</span>
+                        </div>
+                        {% if user.role == 'family' and user.primary_family_member %}
+                        <div class="profile-detail-item">
+                            <i class="bi bi-people profile-detail-icon"></i>
+                            <span class="profile-detail-text">Connected to {{ user.primary_family_member.full_name }}</span>
+                        </div>
+                        {% endif %}
+                        {% if user.aadhar_number %}
+                        <div class="profile-detail-item">
+                            <i class="bi bi-card-text profile-detail-icon"></i>
+                            <span class="profile-detail-text">{{ user.get_masked_aadhar }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Enhanced Badges -->
+                    <div class="profile-badges">
+                        {% if user.role == 'family' %}
+                            <div class="profile-badge badge-family">
+                                <div class="family-connection-indicator"></div>
+                                Family Member
+                            </div>
+                            
+                            {% if user.can_authorize_emergency_visits %}
+                                <div class="profile-badge badge-authorizer">
+                                    <i class="bi bi-shield-check"></i>
+                                    Emergency Authorizer
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="profile-actions">
+                    <a href="{% url 'edit_profile' %}" class="profile-action-btn btn-edit-profile">
+                        <i class="bi bi-pencil"></i>
+                        Edit Profile
+                    </a>
+                    
+                    {% comment %} {% if user.role == 'family' %}
+                    <a href="{% url 'family_management' %}" class="profile-action-btn btn-family-settings">
+                        <i class="bi bi-people"></i>
+                        Family Settings
+                    </a>
+                    {% endif %} {% endcomment %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Enhanced Information Grid -->
+        <div class="info-grid">
+            <!-- Personal Information Section -->
+            <div class="info-section">
+                <div class="info-section-header">
+                    <h5 class="info-section-title">
+                        <i class="bi bi-person-circle"></i>
+                        Personal Information
+                    </h5>
+                </div>
+                <div class="info-section-body">
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="bi bi-at"></i>
+                            Username
+                        </span>
+                        <span class="info-value">{{ user.username }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="bi bi-person"></i>
+                            Full Name
+                        </span>
+                        <span class="info-value">{{ user.full_name|default:"Not provided" }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="bi bi-envelope"></i>
+                            Email Address
+                        </span>
+                        <span class="info-value">{{ user.email|default:"Not provided" }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="bi bi-telephone"></i>
+                            Phone Number
+                        </span>
+                        <span class="info-value">{{ user.phone_number|default:"Not provided" }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="bi bi-geo-alt"></i>
+                            Address
+                        </span>
+                        <span class="info-value">{{ user.address|truncatechars:30|default:"Not provided" }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Identity Information Section -->
+            <div class="info-section">
+                <div class="info-section-header">
+                    <h5 class="info-section-title">
+                        <i class="bi bi-shield-check"></i>
+                        Identity & Security
+                    </h5>
+                </div>
+                <div class="info-section-body">
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="bi bi-card-text"></i>
+                            Aadhar Number
+                        </span>
+                        <span class="info-value">{{ user.get_masked_aadhar }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="bi bi-file-earmark-image"></i>
+                            ID Proof Status
+                        </span>
+                        <span class="info-value">
+                            {% if user.id_proof %}
+                                <span class="status-indicator status-success">Uploaded</span>
+                            {% else %}
+                                <span class="status-indicator status-warning">Not uploaded</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="bi bi-patch-check"></i>
+                            Account Status
+                        </span>
+                        <span class="info-value">
+                            {% if user.has_valid_aadhar %}
+                                <span class="status-indicator status-success">Verified</span>
+                            {% else %}
+                                <span class="status-indicator status-warning">Pending</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="bi bi-calendar-plus"></i>
+                            Member Since
+                        </span>
+                        <span class="info-value">{{ user.date_joined|date:"M d, Y" }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="bi bi-clock-history"></i>
+                            Last Login
+                        </span>
+                        <span class="info-value">{{ user.last_login|date:"M d, Y H:i"|default:"Never" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Enhanced Family Information Section -->
+        {% if user.role == 'family' %}
+        <div class="family-section">
+            <div class="family-section-header">
+                <h5 class="family-section-title">
+                    <i class="bi bi-people-fill"></i>
+                    Family Network
+                </h5>
+            </div>
+            
+            <div class="info-section-body">
+                <!-- Family Status Information -->
+                {% if user.primary_family_member %}
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="bi bi-person-heart"></i>
+                            Primary Family Member
+                        </span>
+                        <span class="info-value">{{ user.primary_family_member.full_name }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="bi bi-diagram-3"></i>
+                            Relationship
+                        </span>
+                        <span class="info-value">{{ user.get_relationship_to_primary_display }}</span>
+                    </div>
+                {% endif %}
+                
+                <div class="info-item">
+                    <span class="info-label">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Emergency Visit Access
+                    </span>
+                    <span class="info-value">
+                        {% if can_request_emergency %}
+                            <span class="status-indicator status-success">Authorized</span>
+                        {% else %}
+                            <span class="status-indicator status-warning">Not Authorized</span>
+                        {% endif %}
+                    </span>
+                </div>
+                
+                {% if user.can_authorize_emergency_visits %}
+                <div class="info-item">
+                    <span class="info-label">
+                        <i class="bi bi-shield-check"></i>
+                        Authorization Role
+                    </span>
+                    <span class="info-value">
+                        <span class="status-indicator status-success">Can Authorize Others</span>
+                    </span>
+                </div>
+                {% endif %}
+                
+                <!-- Connected Family Members -->
+                {% if family_members %}
+                    <div style="margin-top: 2rem;">
+                        <h6 style="color: #ffffff !important; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                            <i class="bi bi-diagram-2"></i>
+                            Connected Family Members ({{ family_members|length }})
+                        </h6>
+                        
+                        <div class="family-members-grid">
+                            {% for member in family_members %}
+                                <div class="family-member-card">
+                                    <div class="family-member-name">
+                                        <i class="bi bi-person-circle"></i>
+                                        {{ member.full_name|default:member.username }}
+                                    </div>
+                                    
+                                    <div class="family-member-details">
+                                        <div class="family-member-detail">
+                                            <i class="bi bi-person-badge"></i>
+                                            {{ member.get_role_display }}
+                                        </div>
+                                        
+                                        {% if member.relationship_to_primary %}
+                                        <div class="family-member-detail">
+                                            <i class="bi bi-diagram-3"></i>
+                                            {{ member.get_relationship_to_primary_display }}
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if member.can_authorize_emergency_visits %}
+                                        <div class="family-member-detail" style="color: #ffffff !important;">
+                                            <i class="bi bi-shield-check"></i>
+                                            Emergency Authorizer
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div style="text-align: center; padding: 2rem; color: #ffffff !important;">
+                        <i class="bi bi-people" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; color: #ffffff !important;"></i>
+                        <p style="color: #ffffff !important;">No family members connected yet.</p>
+                        <a href="{% url 'edit_profile' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-plus"></i> Connect Family Members
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

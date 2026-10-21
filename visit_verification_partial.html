@@ -1,0 +1,29 @@
+<div class="card shadow-sm mt-3 animate__animated animate__fadeIn">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Please Confirm Visitor Identity</h5>
+    </div>
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-4 text-center">
+                {% if visit.visitor.profile_photo %}
+                    <img src="{{ visit.visitor.profile_photo.url }}" class="img-fluid rounded-circle" alt="Visitor Photo" style="width: 100px; height: 100px; object-fit: cover;">
+                {% else %}
+                    <i class="bi bi-person-circle" style="font-size: 100px; color: #6c757d;"></i>
+                {% endif %}
+            </div>
+            <div class="col-md-8">
+                <h6 class="mb-1"><strong>Visitor:</strong> {{ visit.visitor.full_name|default:visit.visitor.username }}</h6>
+                <p class="mb-2 text-muted">Email: {{ visit.visitor.email }}</p>
+                <h6 class="mb-1"><strong>Visiting:</strong> {{ visit.prisoner.first_name }} {{ visit.prisoner.last_name }}</h6>
+                <p class="mb-0 text-muted">Time Slot: {{ visit.visit_time_slot }}</p>
+            </div>
+        </div>
+        <hr>
+        <div class="d-grid">
+            <!-- This button calls a JavaScript function to complete the check-in -->
+            <button onclick="confirmCheckIn('{{ visit.id }}')" class="btn btn-success">
+                <i class="bi bi-check-circle-fill"></i> Confirm & Check-In Visitor
+            </button>
+        </div>
+    </div>
+</div>

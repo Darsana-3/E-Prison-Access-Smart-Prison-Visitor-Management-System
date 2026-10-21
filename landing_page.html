@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>E-Prison Access | Kerala Prisons Visitor Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Enhanced Dark Prison Theme Colors */
+            --bg-primary: #1a1f2e;
+            --bg-secondary: #242936;
+            --bg-accent: #2d3548;
+            --border-color: #3d4556;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --security-red: #ef4444;
+            --security-blue: #3b82f6;
+            --security-green: #22c55e;
+            --warning-orange: #f97316;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Page Loader */
+        .page-loader {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1a1f2e 0%, #242936 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .page-loader.fade-out { opacity: 0; pointer-events: none; }
+
+        .loader-spinner {
+            width: 50px; height: 50px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--security-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Enhanced Navigation */
+        .navbar {
+            background: rgba(26, 31, 46, 0.98) !important;
+            backdrop-filter: blur(12px);
+            border-bottom: 2px solid var(--security-blue);
+            padding: 18px 0;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-primary) !important;
+            transition: all 0.3s ease;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .navbar-brand:hover { 
+            color: var(--security-blue) !important;
+            transform: scale(1.02);
+        }
+
+        .btn-outline-light {
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            background: var(--bg-accent);
+            transition: all 0.3s ease;
+            font-weight: 600;
+            padding: 10px 24px;
+        }
+
+        .btn-outline-light:hover {
+            background: var(--security-blue);
+            color: white;
+            border-color: var(--security-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary {
+            background: var(--security-blue);
+            border: none;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            padding: 10px 24px;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Enhanced Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(26, 31, 46, 0.95) 0%, rgba(36, 41, 54, 0.95) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding-top: 100px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><pattern id="grid" patternUnits="userSpaceOnUse" width="40" height="40"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="%233d4556" stroke-width="1"/></pattern></defs><rect width="1200" height="800" fill="url(%23grid)" opacity="0.3"/></svg>');
+            opacity: 0.5;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content h1 {
+            font-size: 3.8rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.8);
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .hero-content .lead {
+            font-size: 1.4rem;
+            margin-bottom: 2.5rem;
+            color: var(--text-secondary);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            line-height: 1.6;
+        }
+
+        .hero-image {
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-accent) 100%);
+            height: 400px;
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.85;
+        }
+
+        .hero-image::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%);
+        }
+
+        /* Enhanced Statistics Section */
+        .stats-section {
+            background: var(--bg-secondary);
+            padding: 80px 0;
+            border-top: 3px solid var(--security-blue);
+            box-shadow: inset 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 30px;
+            background: var(--bg-accent);
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--security-blue);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--security-blue);
+            display: block;
+            text-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+
+        /* Enhanced About Section */
+        .about-section {
+            background: var(--bg-primary);
+            padding: 100px 0;
+            position: relative;
+        }
+
+        .about-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--security-blue) 0%, var(--security-green) 50%, var(--security-blue) 100%);
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .section-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 4rem;
+            font-weight: 500;
+        }
+
+        .about-section h4 {
+            color: var(--text-primary);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .about-section p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        /* Enhanced Features Grid */
+        .feature-card {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-accent) 100%);
+            padding: 35px;
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            text-align: center;
+            transition: all 0.3s ease;
+            height: 100%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--security-blue);
+            box-shadow: var(--shadow-lg);
+            background: linear-gradient(135deg, var(--bg-accent) 0%, var(--bg-secondary) 100%);
+        }
+
+        .feature-icon {
+            width: 70px; height: 70px;
+            margin: 0 auto 25px;
+            background: linear-gradient(135deg, var(--security-blue) 0%, #2563eb 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+        }
+
+        .feature-card h4 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        /* Enhanced Security Badges */
+        .security-badges {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 35px;
+            flex-wrap: wrap;
+        }
+
+        .security-badge {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%);
+            border: 2px solid var(--security-blue);
+            color: var(--text-primary);
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+        }
+
+        .security-badge:hover {
+            background: var(--security-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Enhanced Footer */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 3px solid var(--security-blue);
+            padding: 50px 0 30px;
+            text-align: center;
+            box-shadow: inset 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .footer h5 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .footer p {
+            font-size: 1.05rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 35px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+
+        .footer-links a:hover { 
+            color: var(--security-blue);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-content h1 { font-size: 2.5rem; }
+            .hero-image { height: 250px; }
+            .section-title { font-size: 2rem; }
+            .stat-number { font-size: 2.5rem; }
+            .security-badges { flex-direction: column; align-items: center; }
+        }
+
+        /* Enhanced Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { 
+            background: var(--security-blue); 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+
+    <!-- Page Loader -->
+    <div class="page-loader" id="pageLoader">
+        <div class="text-center text-white">
+            <div class="loader-spinner mb-3"></div>
+            <h6 style="font-weight: 600; letter-spacing: 1px;">LOADING E-PRISON ACCESS</h6>
+        </div>
+    </div>
+
+    <!-- Enhanced Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-shield-lock-fill me-2"></i>E-PRISON ACCESS
+            </a>
+            <div class="d-flex gap-2">
+                <a href="{% url 'visitor_login' %}" class="btn btn-outline-light">VISITOR LOGIN</a>
+                <a href="{% url 'staff_login' %}" class="btn btn-primary">STAFF ACCESS</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Enhanced Hero Section -->
+    <header class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="hero-content">
+                        <h1>SECURE PRISON ACCESS SYSTEM</h1>
+                        <p class="lead">Advanced digital visitor management for Kerala correctional facilities with QR-based security verification.</p>
+                        <div class="d-flex gap-3 mb-4 flex-wrap">
+                            <a href="{% url 'visitor_login' %}" class="btn btn-primary btn-lg">
+                                <i class="bi bi-person-plus me-2"></i>REGISTER VISIT
+                            </a>
+                            <a href="#about" class="btn btn-outline-light btn-lg">
+                                <i class="bi bi-info-circle me-2"></i>LEARN MORE
+                            </a>
+                        </div>
+                        <div class="security-badges">
+                            <span class="security-badge">
+                                <i class="bi bi-shield-check me-1"></i>SECURE ACCESS
+                            </span>
+                            <span class="security-badge">
+                                <i class="bi bi-qr-code me-1"></i>QR VERIFIED
+                            </span>
+                            <span class="security-badge">
+                                <i class="bi bi-clock me-1"></i>24/7 MONITORING
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mt-4 mt-lg-0">
+                    <div class="hero-image">
+                        {% load static %}
+                        <img src="{% static 'images/emg.jpg' %}" alt="Prison Facility" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Enhanced Statistics -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-item">
+                        <span class="stat-number">50+</span>
+                        <div class="stat-label">ACTIVE FACILITIES</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+               <div class="stat-item">
+                        <span class="stat-number">10K+</span>
+                        <div class="stat-label">REGISTERED VISITORS</div>
+                    </div> 
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-item">
+                        <span class="stat-number">99%</span>
+                        <div class="stat-label">SECURITY RATING</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-item">
+                        <span class="stat-number">24/7</span>
+                        <div class="stat-label">SYSTEM UPTIME</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">DIGITAL PRISON MANAGEMENT</h2>
+                <p class="section-subtitle">Modernizing Kerala's correctional facilities with advanced security technology</p>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <h4>Secure & Efficient Operations</h4>
+                    <p>E-Prison Access digitalizes the entire visitor management process for Kerala's correctional facilities. From registration to QR-verified entry, our system ensures maximum security while streamlining operations.</p>
+                    <p>Built with Django framework and featuring real-time monitoring, emergency protocols, and comprehensive audit trails for government compliance.</p>
+                </div>
+                <div class="col-lg-6">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="bi bi-qr-code-scan"></i>
+                                </div>
+                                <h4>QR VERIFICATION</h4>
+                                <p>Secure touchless entry system</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="bi bi-shield-check"></i>
+                                </div>
+                                <h4>ID VALIDATION</h4>
+                                <p>Digital identity verification</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="bi bi-clock-history"></i>
+                                </div>
+                                <h4>REAL-TIME TRACKING</h4>
+                                <p>Live visitor monitoring system</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                </div>
+                                <h4>EMERGENCY ALERTS</h4>
+                                <p>Instant security notifications</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced Footer -->
+    <footer class="footer">
+        <div class="container">
+            <h5 class="text-white mb-3">
+                <i class="bi bi-shield-lock-fill me-2"></i>E-PRISON ACCESS SYSTEM
+            </h5>
+            <p class="text-secondary mb-3">
+                Government of Kerala - Department of Prisons & Correctional Services<br>
+                Secure Digital Visitor Management Solution
+            </p>
+            <div class="footer-links">
+                <a href="#about">About System</a>
+                <a href="{% url 'visitor_login' %}">Visitor Portal</a>
+                <a href="{% url 'staff_login' %}">Staff Portal</a>
+                <a href="#support">Technical Support</a>
+            </div>
+            <hr style="border-color: var(--border-color); margin: 30px 0;">
+            <p class="text-muted mb-0">&copy; {% now "Y" %} Kerala Prisons Department | Secure Access System</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Page loader
+            setTimeout(() => {
+                document.getElementById('pageLoader').classList.add('fade-out');
+                setTimeout(() => document.getElementById('pageLoader').style.display = 'none', 500);
+            }, 1000);
+
+            // Smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            });
+
+            // Navbar scroll effect
+            window.addEventListener('scroll', () => {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 50) {
+                    navbar.style.background = 'rgba(26, 31, 46, 1)';
+                    navbar.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.6)';
+                } else {
+                    navbar.style.background = 'rgba(26, 31, 46, 0.98)';
+                }
+            });
+
+            // Counter animation for stats
+            const stats = document.querySelectorAll('.stat-number');
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const target = entry.target;
+                        const finalNumber = target.textContent.replace(/\D/g, '');
+                        let current = 0;
+                        const increment = finalNumber / 50;
+                        
+                        const timer = setInterval(() => {
+                            current += increment;
+                            if (current >= finalNumber) {
+                                current = finalNumber;
+                                clearInterval(timer);
+                            }
+                            
+                            if (target.textContent.includes('%')) {
+                                target.textContent = Math.floor(current) + '%';
+                            } else if (target.textContent.includes('K')) {
+                                target.textContent = Math.floor(current / 1000) + 'K+';
+                            } else if (target.textContent.includes('/')) {
+                                target.textContent = '24/7';
+                            } else {
+                                target.textContent = Math.floor(current) + '+';
+                            }
+                        }, 30);
+                        
+                        observer.unobserve(target);
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            stats.forEach(stat => observer.observe(stat));
+        });
+    </script>
+
+</body>
+</html>

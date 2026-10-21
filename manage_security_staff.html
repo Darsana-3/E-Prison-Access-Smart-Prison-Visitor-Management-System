@@ -1,0 +1,697 @@
+{% extends "base.html" %}
+{% block title %}Manage Security Staff{% endblock %}
+
+{% block content %}
+<style>
+/* Dark Prison Theme - Security Staff Management */
+:root {
+    --bg-dark: #1a1a1a;
+    --bg-card: #2d2d2d;
+    --bg-input: #404040;
+    --bg-accent: #363636;
+    --bg-table-row: #333333;
+    --border: #555;
+    --text-white: #ffffff;
+    --text-bright: #f8f9fa;
+    --text-light: #e9ecef;
+    --text-muted: #d1d5db;
+    --text-gray: #9ca3af;
+    --name-black: #000000;
+    --primary: #0066cc;
+    --success: #28a745;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --info: #17a2b8;
+}
+
+body {
+    background: var(--bg-dark) !important;
+    color: var(--text-white) !important;
+}
+
+/* Page Header */
+.page-header {
+    background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-accent) 100%);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-top: 4px solid var(--primary);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.page-header h2 {
+    color: var(--text-white) !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 1.6rem !important;
+}
+
+.page-subtitle {
+    color: var(--text-light) !important;
+    font-size: 0.95rem !important;
+    margin-bottom: 0 !important;
+    opacity: 0.9;
+}
+
+/* Create Account Form Card */
+.create-form-card {
+    background: var(--bg-card) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4) !important;
+    height: fit-content !important;
+    overflow: hidden;
+}
+
+.create-form-card .card-header {
+    background: linear-gradient(135deg, var(--primary) 0%, #0056b3 100%) !important;
+    border-bottom: 2px solid var(--border) !important;
+    color: white !important;
+    padding: 1.5rem !important;
+}
+
+.create-form-card .card-header h4 {
+    color: white !important;
+    font-weight: 600 !important;
+    margin-bottom: 0 !important;
+    font-size: 1.2rem !important;
+}
+
+.create-form-card .card-body {
+    background: transparent !important;
+    color: var(--text-white) !important;
+    padding: 2rem !important;
+}
+
+.form-description {
+    color: var(--text-muted) !important;
+    font-size: 0.9rem !important;
+    margin-bottom: 2rem !important;
+    padding: 1rem !important;
+    background: var(--bg-input) !important;
+    border-radius: 6px !important;
+    border-left: 4px solid var(--primary) !important;
+}
+
+/* Enhanced Form Labels and Inputs */
+.form-label,
+label {
+    color: var(--text-white) !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.75rem !important;
+    font-size: 0.95rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    display: block !important;
+}
+
+.form-control {
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    color: var(--text-white) !important;
+    padding: 0.875rem 1rem !important;
+    border-radius: 8px !important;
+    font-size: 1rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.form-control:focus {
+    background: var(--bg-input) !important;
+    border-color: var(--primary) !important;
+    color: var(--text-white) !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25) !important;
+    outline: none !important;
+}
+
+.form-control::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 0.8 !important;
+}
+
+/* Help Text */
+.form-text,
+small.text-muted {
+    color: var(--text-muted) !important;
+    font-size: 0.8rem !important;
+    margin-top: 0.5rem !important;
+    display: block !important;
+    font-weight: 500 !important;
+}
+
+/* Create Account Button */
+.btn-create-account {
+    background: linear-gradient(135deg, var(--primary) 0%, #0056b3 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 700 !important;
+    padding: 0.875rem 1.5rem !important;
+    border-radius: 8px !important;
+    font-size: 1rem !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 3px 8px rgba(0, 102, 204, 0.3) !important;
+}
+
+.btn-create-account:hover {
+    background: linear-gradient(135deg, #0056b3 0%, var(--primary) 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 12px rgba(0, 102, 204, 0.4) !important;
+    color: white !important;
+}
+
+/* Staff List Card */
+.staff-list-card {
+    background: var(--bg-card) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4) !important;
+    overflow: hidden;
+}
+
+.staff-list-card .card-body {
+    background: transparent !important;
+    color: var(--text-white) !important;
+    padding: 0 !important;
+}
+
+.staff-list-header {
+    background: var(--bg-input) !important;
+    border-bottom: 2px solid var(--border) !important;
+    padding: 1.5rem !important;
+    margin-bottom: 0 !important;
+}
+
+.staff-list-header h4 {
+    color: var(--text-white) !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 1.3rem !important;
+}
+
+.facility-name {
+    color: var(--text-muted) !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    background: var(--bg-accent) !important;
+    padding: 0.4rem 0.8rem !important;
+    border-radius: 15px !important;
+    display: inline-block !important;
+}
+
+/* Enhanced Table Styling */
+.table {
+    color: var(--text-white) !important;
+    margin-bottom: 0 !important;
+    background: transparent !important;
+}
+
+.table thead th {
+    background: var(--bg-input) !important;
+    color: var(--text-bright) !important;
+    border-bottom: 2px solid var(--border) !important;
+    border-top: none !important;
+    padding: 1.25rem !important;
+    font-weight: 700 !important;
+    font-size: 0.9rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.table tbody tr {
+    background: var(--bg-card) !important;
+    border-bottom: 1px solid var(--border) !important;
+    transition: all 0.3s ease !important;
+}
+
+.table tbody tr:hover {
+    background: var(--bg-table-row) !important;
+    transform: translateX(3px) !important;
+    box-shadow: inset 4px 0 0 var(--primary) !important;
+}
+
+.table tbody td {
+    color: var(--text-bright) !important;
+    border-top: 1px solid var(--border) !important;
+    padding: 1.25rem !important;
+    vertical-align: middle !important;
+}
+
+/* Staff Names with Black Text on White Background */
+.staff-username,
+.staff-fullname {
+    color: var(--name-black) !important;
+    background: var(--text-white) !important;
+    font-weight: 800 !important;
+    font-size: 1rem !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 6px !important;
+    display: inline-block !important;
+    border: 1px solid var(--border) !important;
+    min-width: 150px !important;
+    text-align: center !important;
+}
+
+/* Delete Button */
+.btn-delete {
+    background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 6px !important;
+    font-size: 0.85rem !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.3px !important;
+}
+
+.btn-delete:hover {
+    background: linear-gradient(135deg, #c82333 0%, var(--danger) 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 3px 8px rgba(220, 53, 69, 0.3) !important;
+    color: white !important;
+}
+
+.btn-delete i {
+    margin-right: 0.5rem !important;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center !important;
+    padding: 3rem 2rem !important;
+    background: var(--bg-input) !important;
+    border-radius: 8px !important;
+    margin: 1rem !important;
+}
+
+.empty-state i {
+    color: var(--text-gray) !important;
+    font-size: 3rem !important;
+    margin-bottom: 1rem !important;
+}
+
+.empty-state p {
+    color: var(--text-muted) !important;
+    margin-bottom: 1rem !important;
+    font-size: 0.95rem !important;
+}
+
+/* Error Messages */
+.invalid-feedback {
+    color: var(--danger) !important;
+    font-weight: 500 !important;
+    font-size: 0.85rem !important;
+    margin-top: 0.5rem !important;
+}
+
+/* Statistics Bar */
+.stats-bar {
+    background: var(--bg-input) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin-bottom: 1.5rem !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.stat-item {
+    text-align: center !important;
+}
+
+.stat-number {
+    color: var(--text-bright) !important;
+    font-size: 1.4rem !important;
+    font-weight: 800 !important;
+    display: block !important;
+}
+
+.stat-label {
+    color: var(--text-muted) !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .staff-list-header {
+        text-align: center !important;
+    }
+    
+    .facility-name {
+        margin-top: 0.5rem !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .create-form-card .card-body {
+        padding: 1.5rem !important;
+    }
+    
+    .staff-list-header {
+        padding: 1rem !important;
+    }
+    
+    .table {
+        font-size: 0.85rem;
+    }
+    
+    .table thead th,
+    .table tbody td {
+        padding: 0.75rem 0.5rem !important;
+    }
+    
+    .staff-username,
+    .staff-fullname {
+        min-width: auto !important;
+        font-size: 0.9rem !important;
+        padding: 0.4rem 0.8rem !important;
+    }
+    
+    .btn-delete {
+        font-size: 0.75rem !important;
+        padding: 0.4rem 0.8rem !important;
+    }
+    
+    .stats-bar {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+/* Loading Animation */
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<!-- Page Header -->
+<div class="page-header">
+    <div class="text-center">
+        <h2><i class="bi bi-people-fill me-2"></i>SECURITY STAFF MANAGEMENT</h2>
+        <p class="page-subtitle">Create and manage security personnel accounts for facility operations</p>
+    </div>
+</div>
+
+<!-- Statistics Bar -->
+<div class="stats-bar">
+    <div class="stat-item">
+        <span class="stat-number">{{ security_staff|length }}</span>
+        <div class="stat-label">Active Staff</div>
+    </div>
+    {% comment %} <div class="stat-item">
+        <span class="stat-number">{{ user.jail.name|length|default:"0" }}</span>
+        <div class="stat-label">Facility Code</div>
+    </div>
+    <div class="stat-item">
+        <span class="stat-number">24/7</span>
+        <div class="stat-label">Security Coverage</div>
+    </div> {% endcomment %}
+</div>
+
+<div class="row g-4">
+    <!-- Create New Security Staff Form Column -->
+    <div class="col-lg-4">
+        <div class="card create-form-card fade-in">
+            <div class="card-header">
+                <h4><i class="bi bi-person-plus-fill me-2"></i>CREATE SECURITY ACCOUNT</h4>
+            </div>
+            <div class="card-body">
+                <div class="form-description">
+                    <i class="bi bi-shield-check me-2"></i>
+                    <strong>Create Account:</strong> New accounts are automatically assigned to your facility with Gate Security permissions.
+                </div>
+                
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                        <div class="mb-3">
+                            {{ field.label_tag }}
+                            {% if field.name == 'username' %}
+                                <input type="text" 
+                                       name="{{ field.name }}" 
+                                       class="form-control" 
+                                       id="{{ field.id_for_label }}" 
+                                       placeholder="Enter staff username"
+                                       style="font-family: 'Courier New', monospace;"
+                                       required>
+                            {% elif field.name == 'full_name' %}
+                                <input type="text" 
+                                       name="{{ field.name }}" 
+                                       class="form-control" 
+                                       id="{{ field.id_for_label }}" 
+                                       placeholder="Enter full name"
+                                       required>
+                            {% elif field.name == 'password' %}
+                                <input type="password" 
+                                       name="{{ field.name }}" 
+                                       class="form-control" 
+                                       id="{{ field.id_for_label }}" 
+                                       placeholder="Enter secure password"
+                                       required>
+                            {% else %}
+                                {{ field }}
+                            {% endif %}
+                            
+                            {% if field.help_text %}
+                                <small class="form-text text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>{{ field.help_text }}
+                                </small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="invalid-feedback d-block">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-create-account w-100 mt-3" id="createBtn">
+                        <i class="bi bi-plus-circle me-2"></i>Create Account
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Existing Security Staff List Column -->
+    <div class="col-lg-8">
+        <div class="card staff-list-card fade-in">
+            <div class="staff-list-header">
+                <h4><i class="bi bi-shield-lock me-2"></i>Security Staff Roster</h4>
+                <div class="facility-name">
+                    <i class="bi bi-building me-1"></i>{{ user.jail.name }}
+                </div>
+            </div>
+            
+            <div class="card-body">
+                {% if security_staff %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th><i class="bi bi-person-badge me-2"></i>Username</th>
+                                <th><i class="bi bi-person me-2"></i>Full Name</th>
+                                <th class="text-end"><i class="bi bi-gear me-2"></i>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for staff in security_staff %}
+                            <tr data-staff-id="{{ staff.pk }}">
+                                <td>
+                                    <div class="staff-username" style="color: #000000 !important; background: #ffffff !important;">
+                                        {{ staff.username }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="staff-fullname" style="color: #000000 !important; background: #ffffff !important;">
+                                        {{ staff.full_name }}
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <a href="{% url 'delete_security_staff' staff.pk %}" 
+                                       class="btn btn-delete"
+                                       onclick="return confirm('Are you sure you want to delete staff member {{ staff.username }}? This action cannot be undone.')">
+                                        <i class="bi bi-trash-fill"></i>Remove
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <!-- Empty State -->
+                <div class="empty-state">
+                    <i class="bi bi-people"></i>
+                    <p>No security staff have been created for this facility yet.</p>
+                    <small class="text-muted">Use the form on the left to create your first security staff account.</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add fade-in animation
+    const fadeElements = document.querySelectorAll('.fade-in');
+    fadeElements.forEach((element, index) => {
+        setTimeout(() => {
+            element.style.opacity = '1';
+        }, index * 200);
+    });
+
+    // Form validation and submission
+    const form = document.querySelector('form');
+    const createBtn = document.getElementById('createBtn');
+    
+    if (form && createBtn) {
+        form.addEventListener('submit', function(e) {
+            const username = document.querySelector('input[name="username"]').value.trim();
+            const fullName = document.querySelector('input[name="full_name"]').value.trim();
+            const password = document.querySelector('input[name="password"]').value;
+            
+            // Basic validation
+            if (!username || !fullName || !password) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+                return false;
+            }
+            
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('Password must be at least 6 characters long.');
+                return false;
+            }
+            
+            // Show loading state
+            createBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Creating Account...';
+            createBtn.disabled = true;
+            
+            // Re-enable after timeout (in case of errors)
+            setTimeout(() => {
+                createBtn.innerHTML = '<i class="bi bi-plus-circle me-2"></i>Create Account';
+                createBtn.disabled = false;
+            }, 8000);
+        });
+    }
+
+    // Force name visibility on staff list
+    const staffUsernames = document.querySelectorAll('.staff-username');
+    const staffFullnames = document.querySelectorAll('.staff-fullname');
+    
+    staffUsernames.forEach(name => {
+        name.style.color = '#000000';
+        name.style.background = '#ffffff';
+        name.style.fontWeight = '800';
+        name.style.fontSize = '1rem';
+        name.style.padding = '0.5rem 1rem';
+        name.style.borderRadius = '6px';
+        name.style.display = 'inline-block';
+        name.style.border = '1px solid #555';
+        name.style.minWidth = '150px';
+        name.style.textAlign = 'center';
+    });
+    
+    staffFullnames.forEach(name => {
+        name.style.color = '#000000';
+        name.style.background = '#ffffff';
+        name.style.fontWeight = '800';
+        name.style.fontSize = '1rem';
+        name.style.padding = '0.5rem 1rem';
+        name.style.borderRadius = '6px';
+        name.style.display = 'inline-block';
+        name.style.border = '1px solid #555';
+        name.style.minWidth = '150px';
+        name.style.textAlign = 'center';
+    });
+
+    // Enhanced row hover effects
+    const tableRows = document.querySelectorAll('tbody tr[data-staff-id]');
+    tableRows.forEach((row, index) => {
+        // Stagger animation
+        row.style.animationDelay = `${index * 0.1}s`;
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.borderLeft = '4px solid var(--primary)';
+            this.style.paddingLeft = '12px';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.borderLeft = 'none';
+            this.style.paddingLeft = '16px';
+        });
+    });
+
+    // Delete button click animation
+    const deleteButtons = document.querySelectorAll('.btn-delete');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            if (confirm('Are you sure you want to delete this staff member? This action cannot be undone.')) {
+                this.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Removing...';
+                this.disabled = true;
+            } else {
+                e.preventDefault();
+            }
+        });
+    });
+
+    // Username formatting
+    const usernameInput = document.querySelector('input[name="username"]');
+    if (usernameInput) {
+        usernameInput.addEventListener('input', function() {
+            // Remove spaces and convert to lowercase
+            this.value = this.value.toLowerCase().replace(/\s+/g, '');
+        });
+    }
+
+    // Animate statistics numbers
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(stat => {
+        const finalValue = parseInt(stat.textContent);
+        if (!isNaN(finalValue) && finalValue > 0) {
+            stat.textContent = '0';
+            let current = 0;
+            const increment = Math.max(1, Math.ceil(finalValue / 15));
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= finalValue) {
+                    current = finalValue;
+                    clearInterval(timer);
+                }
+                stat.textContent = current;
+            }, 100);
+        }
+    });
+});
+
+// Prevent double submission
+let isSubmitting = false;
+document.addEventListener('submit', function(e) {
+    if (isSubmitting) {
+        e.preventDefault();
+        return false;
+    }
+    isSubmitting = true;
+    
+    setTimeout(() => {
+        isSubmitting = false;
+    }, 3000);
+});
+</script>
+{% endblock %}
